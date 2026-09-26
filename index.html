@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear SVM Interactive Visualizer - CEI KMITL</title>
+  <style>
+    /* CSS Reset & Dark Theme */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header & Footer */
+    header {
+      background-color: #1e293b;
+      padding: 12px 24px;
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: 1.4rem;
+      color: #38bdf8;
+      margin-bottom: 4px;
+    }
+    header p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    footer {
+      background-color: #1e293b;
+      padding: 8px 24px;
+      border-top: 1px solid #334155;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* Main Split Layout */
+    .main-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .column {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .column-left {
+      border-right: 1px solid #334155;
+    }
+
+    /* Cards / Panels */
+    .card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      color: #f1f5f9;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+    }
+
+    /* Canvas styling */
+    .canvas-container {
+      position: relative;
+      width: 150%;
+      height: 150%;
+      aspect-ratio: 1 / 1;
+      max-height: 380px;
+      background-color: #020617;
+      border: 1px solid #475569;
+      border-radius: 6px;
+    }
+    .data-canvas-container {
+      max-width: 380px;
+      margin-inline: auto;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Controls & Buttons */
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control-group label {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #38bdf8;
+    }
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    button {
+      background-color: #334155;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    button:hover {
+      background-color: #475569;
+      border-color: #64748b;
+    }
+    button.primary {
+      background-color: #0284c7;
+      border-color: #0369a1;
+    }
+    button.primary:hover {
+      background-color: #0369a1;
+    }
+    button.danger {
+      background-color: #be123c;
+      border-color: #9f1239;
+    }
+    button.danger:hover {
+      background-color: #9f1239;
+    }
+
+    /* Radio buttons for selecting class */
+    .class-selector {
+      display: flex;
+      gap: 12px;
+      font-size: 0.85rem;
+      align-items: center;
+    }
+    .class-selector label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    /* Equations & State Display */
+    .stat-box {
+      font-family: monospace;
+      background-color: #020617;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #334155;
+      font-size: 0.85rem;
+      color: #38bdf8;
+      line-height: 1.5;
+    }
+    .explanation {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+    @media (max-width: 720px) {
+      body { height: auto; min-height: 100vh; overflow: auto; }
+      .main-container { display: block; overflow: visible; }
+      .column { overflow: visible; }
+      .column-left { border-right: 0; }
+      footer { gap: 10px; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Linear Support Vector Machine (SVM) Visualizer</h1>
+    <p>An interactive tool to understand Soft-Margin Linear SVM optimization using Stochastic Gradient Descent (SGD).</p>
+  </header>
+
+  <!-- Main Body Content -->
+  <div class="main-container">
+
+    <!-- Left Column -->
+    <div class="column column-left">
+      <!-- Top-Left: Data Canvas -->
+      <div class="card">
+        <h2>Data Canvas</h2>
+        <div class="class-selector">
+          <span>Active Class:</span>
+          <label style="color: #38bdf8;">
+            <input type="radio" name="classSelect" value="1" checked> Class +1 (Blue)
+          </label>
+          <label style="color: #fb923c;">
+            <input type="radio" name="classSelect" value="-1"> Class -1 (Orange)
+          </label>
+        </div>
+        <div class="canvas-container data-canvas-container">
+          <canvas id="dataCanvas" width="400" height="400"></canvas>
+        </div>
+        <p class="explanation">
+          <b>Controls:</b> Click or tap to add a point. Select Delete mode and click a point to remove it. Right-click also removes points.
+        </p>
+        <label class="explanation"><input type="checkbox" id="deleteMode"> Delete mode</label>
+      </div>
+
+      <!-- Bottom-Left: Hyperparameters & Controls -->
+      <div class="card">
+        <h2>Hyperparameters & Controls</h2>
+        
+        <div class="control-group">
+          <label for="lr">Learning Rate (&eta;): <span id="lrVal">0.01</span></label>
+          <input type="range" id="lr" min="0.001" max="0.1" step="0.001" value="0.01">
+        </div>
+
+        <div class="control-group">
+          <label for="cVal">Regularization (C): <span id="cValDisp">1.0</span></label>
+          <input type="range" id="cVal" min="0.1" max="10" step="0.1" value="1.0">
+        </div>
+
+        <div class="btn-grid">
+          <button id="stepBtn" class="primary">Step</button>
+          <button id="playBtn">Play / Pause</button>
+          <button id="randBtn">Random Data</button>
+          <button id="resetBtn">Reset Model</button>
+          <button id="clearBtn" class="danger">Clear Points</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="column">
+      <!-- Top-Right: Model State -->
+      <div class="card">
+        <h2>Model State & Parameters</h2>
+        <div class="stat-box" id="modelState">
+          Epoch: 0<br>
+          Weights (w): [0.000, 0.000]<br>
+          Bias (b): 0.000<br>
+          Hyperplane: 0.000x₁ + 0.000x₂ + 0.000 = 0
+        </div>
+        <p class="explanation">
+          <b>Formula:</b> Linear SVM minimizes Hinge Loss + L2 Penalty:<br>
+          <code style="color: #38bdf8;">Loss = ½ ||w||² + C * Σ max(0, 1 - yᵢ(w · xᵢ + b))</code>
+        </p>
+      </div>
+
+      <!-- Bottom-Right: Loss Graph -->
+      <div class="card">
+        <h2>Loss Graph (Total SVM Objective)</h2>
+        <div class="canvas-container" style="max-height: 250px;">
+          <canvas id="lossCanvas" width="400" height="250"></canvas>
+        </div>
+        <div class="stat-box" id="lossText">
+          Objective: 0.0000
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      Group Members: Patchpakintr C. (67011242), Watcharathorn K. (67011380), Worawalun S. (67011385), Kittisak C. (67011613), Sirawich S. (67011655), Techin L. (67011660)
+    </div>
+    <div>CEI KMITL</div>
+  </footer>
+
+  <!-- Embedded JavaScript Logic -->
+  <script>
+    // Elements Setup
+    const dataCanvas = document.getElementById('dataCanvas');
+    const dCtx = dataCanvas.getContext('2d');
+    const lossCanvas = document.getElementById('lossCanvas');
+    const lCtx = lossCanvas.getContext('2d');
+
+    const lrSlider = document.getElementById('lr');
+    const lrVal = document.getElementById('lrVal');
+    const cSlider = document.getElementById('cVal');
+    const cValDisp = document.getElementById('cValDisp');
+
+    const stepBtn = document.getElementById('stepBtn');
+    const playBtn = document.getElementById('playBtn');
+    const randBtn = document.getElementById('randBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const modelStateElem = document.getElementById('modelState');
+    const lossTextElem = document.getElementById('lossText');
+
+    // Data & Model State
+    let points = []; // Array of {x: [-1, 1], y: [-1, 1], label: 1 | -1}
+    let w = [0.0, 0.0];
+    let b = 0.0;
+    let epoch = 0;
+    let lossHistory = [];
+    let isPlaying = false;
+    let animationFrameId = null;
+    let stableEpochs = 0;
+    let lastLoss = Infinity;
+    const MAX_EPOCHS = 3000;
+
+    // Synchronize Hyperparameter Labels
+    lrSlider.addEventListener('input', () => { lrVal.textContent = parseFloat(lrSlider.value).toFixed(3); resetModel(); });
+    cSlider.addEventListener('input', () => { cValDisp.textContent = parseFloat(cSlider.value).toFixed(1); resetModel(); });
+
+    // Canvas Coordinates Conversion
+    function canvasToMath(cx, cy) {
+      return {
+        x: (cx / dataCanvas.width) * 2 - 1,
+        y: -((cy / dataCanvas.height) * 2 - 1)
+      };
+    }
+
+    function mathToCanvas(mx, my) {
+      return {
+        cx: (mx + 1) * 0.5 * dataCanvas.width,
+        cy: (-my + 1) * 0.5 * dataCanvas.height
+      };
+    }
+
+    // Initialize Random Points
+    function generateRandomPoints() {
+      points = [];
+      for (let i = 0; i < 15; i++) {
+        points.push({
+          x: Math.random() * 0.7 - 0.8,
+          y: Math.random() * 0.8 - 0.4 + 0.3,
+          label: 1
+        });
+        points.push({
+          x: Math.random() * 0.7 + 0.1,
+          y: Math.random() * 0.8 - 0.4 - 0.3,
+          label: -1
+        });
+      }
+      resetModel();
+    }
+
+    // Add / Delete Points Canvas Events
+    dataCanvas.addEventListener('click', (e) => {
+      const rect = dataCanvas.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
+      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
+      const mathPt = canvasToMath(cx, cy);
+      if (document.getElementById('deleteMode').checked) {
+        removePoint(mathPt);
+        return;
+      }
+      const activeClass = parseInt(document.querySelector('input[name="classSelect"]:checked').value);
+      
+      points.push({ x: mathPt.x, y: mathPt.y, label: activeClass });
+      resetModel();
+    });
+
+    dataCanvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = dataCanvas.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
+      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
+      const mathPt = canvasToMath(cx, cy);
+
+      removePoint(mathPt);
+    });
+
+    function removePoint(mathPt) {
+      let nearest = -1, distance = Infinity;
+      points.forEach((p, i) => {
+        const d = Math.hypot(p.x - mathPt.x, p.y - mathPt.y);
+        if (d < distance) { distance = d; nearest = i; }
+      });
+      if (distance < 0.08) {
+        points.splice(nearest, 1);
+        resetModel();
+      }
+    }
+
+    // Full-batch subgradient descent on the displayed soft-margin objective.
+    function trainStep() {
+      if (!points.some(p => p.label === 1) || !points.some(p => p.label === -1)) {
+        if (isPlaying) togglePlay();
+        lossTextElem.textContent = 'Add at least one point from each class to train.';
+        return;
+      }
+
+      const lr = parseFloat(lrSlider.value);
+      const C = parseFloat(cSlider.value);
+      let gradW0 = w[0], gradW1 = w[1], gradB = 0;
+      let active = 0;
+      for (const p of points) {
+        const margin = p.label * (w[0] * p.x + w[1] * p.y + b);
+        if (margin < 1) {
+          gradW0 -= C * p.label * p.x / points.length;
+          gradW1 -= C * p.label * p.y / points.length;
+          gradB -= C * p.label / points.length;
+          active++;
+        }
+      }
+      w[0] -= lr * gradW0;
+      w[1] -= lr * gradW1;
+      b -= lr * gradB;
+      epoch++;
+      const currentLoss = computeHingeLoss();
+      lossHistory.push(currentLoss);
+      stableEpochs = Math.abs(lastLoss - currentLoss) < 0.00005 ? stableEpochs + 1 : 0;
+      lastLoss = currentLoss;
+      updateUI();
+      lossTextElem.textContent += ` · ${active} margin violator${active === 1 ? '' : 's'} updated the model.`;
+      if (stableEpochs >= 20 || epoch >= MAX_EPOCHS) {
+        if (isPlaying) togglePlay();
+        lossTextElem.textContent += stableEpochs >= 20 ? ' Converged.' : ' Reached epoch limit.';
+      }
+    }
+
+    function computeHingeLoss() {
+      if (points.length === 0) return 0;
+      const C = parseFloat(cSlider.value);
+      let reg = 0.5 * (w[0] * w[0] + w[1] * w[1]);
+      let hinge = 0;
+
+      for (let p of points) {
+        let margin = p.label * (w[0] * p.x + w[1] * p.y + b);
+        hinge += Math.max(0, 1 - margin);
+      }
+
+      return reg + C * (hinge / points.length);
+    }
+
+    function resetModel() {
+      w = [0.0, 0.0];
+      b = 0.0;
+      epoch = 0;
+      lossHistory = [];
+      stableEpochs = 0;
+      lastLoss = Infinity;
+      if (isPlaying) togglePlay();
+      updateUI();
+    }
+
+    // UI Updates & Visualizations
+    function updateUI() {
+      drawDataCanvas();
+      drawLossCanvas();
+
+      modelStateElem.innerHTML = `
+        Epoch: ${epoch}<br>
+        Weights (w): [${w[0].toFixed(3)}, ${w[1].toFixed(3)}]<br>
+        Bias (b): ${b.toFixed(3)}<br>
+        Hyperplane: ${w[0].toFixed(2)}x₁ + ${w[1].toFixed(2)}x₂ + ${b.toFixed(2)} = 0
+      `;
+
+      const curLoss = computeHingeLoss();
+      const support = points.filter(p => p.label * (w[0] * p.x + w[1] * p.y + b) <= 1.001).length;
+      lossTextElem.textContent = `Objective: ${curLoss.toFixed(4)} · ${support} point${support === 1 ? '' : 's'} on or inside the margin`;
+    }
+
+    // Draw Data Canvas (Points + SVM Boundary)
+    function drawDataCanvas() {
+      dCtx.clearRect(0, 0, dataCanvas.width, dataCanvas.height);
+
+      // Draw Grid / Axes
+      dCtx.strokeStyle = '#334155';
+      dCtx.lineWidth = 1;
+      dCtx.beginPath();
+      dCtx.moveTo(dataCanvas.width / 2, 0); dCtx.lineTo(dataCanvas.width / 2, dataCanvas.height);
+      dCtx.moveTo(0, dataCanvas.height / 2); dCtx.lineTo(dataCanvas.width, dataCanvas.height / 2);
+      dCtx.stroke();
+
+      // Draw SVM Boundary Lines (Hyperplane & Margins)
+      if (w[0] !== 0 || w[1] !== 0) {
+        drawLine(0, '#38bdf8', 2);  // Hyperplane: w.x + b = 0
+        drawLine(1, '#94a3b8', 1, [4, 4]);  // Positive Margin: w.x + b = 1
+        drawLine(-1, '#94a3b8', 1, [4, 4]); // Negative Margin: w.x + b = -1
+      }
+
+      // Draw Data Points
+      for (let p of points) {
+        const { cx, cy } = mathToCanvas(p.x, p.y);
+        dCtx.beginPath();
+        dCtx.arc(cx, cy, 6, 0, 2 * Math.PI);
+        dCtx.fillStyle = p.label === 1 ? '#38bdf8' : '#fb923c';
+        dCtx.fill();
+        dCtx.strokeStyle = '#020617';
+        dCtx.lineWidth = 1.5;
+        dCtx.stroke();
+      }
+    }
+
+    function drawLine(offset, color, strokeWidth, dash = []) {
+      dCtx.save();
+      dCtx.strokeStyle = color;
+      dCtx.lineWidth = strokeWidth;
+      dCtx.setLineDash(dash);
+      dCtx.beginPath();
+
+      // Line Equation: w0*x + w1*y + b = offset  =>  y = (offset - b - w0*x) / w1
+      let x1 = -1, y1 = (offset - b - w[0] * x1) / (w[1] || 0.0001);
+      let x2 = 1, y2 = (offset - b - w[0] * x2) / (w[1] || 0.0001);
+
+      let p1 = mathToCanvas(x1, y1);
+      let p2 = mathToCanvas(x2, y2);
+
+      dCtx.moveTo(p1.cx, p1.cy);
+      dCtx.lineTo(p2.cx, p2.cy);
+      dCtx.stroke();
+      dCtx.restore();
+    }
+
+    // Draw Loss Tracking Graph
+    function drawLossCanvas() {
+      lCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
+
+      if (lossHistory.length < 2) return;
+
+      const maxLoss = Math.max(...lossHistory, 1.0);
+      const padding = 20;
+      const w = lossCanvas.width - padding * 2;
+      const h = lossCanvas.height - padding * 2;
+
+      lCtx.strokeStyle = '#ef4444';
+      lCtx.lineWidth = 2;
+      lCtx.beginPath();
+
+      for (let i = 0; i < lossHistory.length; i++) {
+        const x = padding + (i / (lossHistory.length - 1)) * w;
+        const y = lossCanvas.height - padding - (lossHistory[i] / maxLoss) * h;
+
+        if (i === 0) lCtx.moveTo(x, y);
+        else lCtx.lineTo(x, y);
+      }
+      lCtx.stroke();
+    }
+
+    // Play Loop
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      playBtn.textContent = isPlaying ? 'Pause' : 'Play until Convergence';
+      playBtn.classList.toggle('primary', isPlaying);
+
+      if (isPlaying) {
+        function loop() {
+          if (!isPlaying) return;
+          trainStep();
+          if (isPlaying) animationFrameId = requestAnimationFrame(loop);
+        }
+        loop();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+      }
+    }
+
+    // Controls Event Listeners
+    stepBtn.addEventListener('click', trainStep);
+    playBtn.addEventListener('click', togglePlay);
+    randBtn.addEventListener('click', generateRandomPoints);
+    document.getElementById('resetBtn').addEventListener('click', resetModel);
+    clearBtn.addEventListener('click', () => {
+      points = [];
+      resetModel();
+    });
+
+    // Initialize App
+    generateRandomPoints();
+  </script>
+</body>
+</html>
