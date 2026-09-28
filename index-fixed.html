@@ -59,7 +59,7 @@
       line-height: 1.4;
     }
 
-    /* Independently scrolling columns */
+    /* Independent column scrolling */
     .main-container {
       display: flex;
       flex: 1 1 0;
@@ -84,7 +84,6 @@
       scrollbar-color: #887058 #222;
     }
 
-    /* Shared panels */
     .card {
       display: flex;
       flex-direction: column;
@@ -154,7 +153,7 @@
       outline-offset: 3px;
     }
 
-    /* Data Canvas / Input */
+    /* Data Canvas */
     .data-card {
       padding: 20px 24px 18px;
       border: 1px solid #665c50;
@@ -190,7 +189,6 @@
       line-height: 1.4;
     }
 
-    /* Data toolbar */
     .toolbar {
       display: flex;
       align-items: center;
@@ -221,17 +219,9 @@
       border-color: #ffd39f;
     }
 
-    .data-card #randBtn:hover {
-      background: #ff971e;
-    }
-
     .data-card #clearBtn {
       background: #817466;
       border-color: #938676;
-    }
-
-    .data-card #clearBtn:hover {
-      background: #958574;
     }
 
     .toolbar-divider {
@@ -242,7 +232,6 @@
       background: #d7c8b5;
     }
 
-    /* Class selection */
     .class-selector {
       display: flex;
       align-items: center;
@@ -308,7 +297,7 @@
       background: #fb923c;
     }
 
-    /* ADD / DELETE switch */
+    /* ADD / DELETE */
     .mode-switch {
       position: relative;
       display: flex;
@@ -332,19 +321,14 @@
       user-select: none;
     }
 
-    .mode-switch input:not(:checked) ~ .add-mode {
-      background: #a79885;
-      box-shadow: inset 0 0 0 1px #c4b49d;
-      pointer-events: none;
-    }
-
+    .mode-switch input:not(:checked) ~ .add-mode,
     .mode-switch input:checked ~ .delete-mode {
       background: #a79885;
       box-shadow: inset 0 0 0 1px #c4b49d;
       pointer-events: none;
     }
 
-    /* Brush controls use the existing Data Canvas font */
+    /* Additional brush controls */
     .brush-controls {
       display: flex;
       flex-wrap: wrap;
@@ -373,7 +357,7 @@
       min-width: 38px;
     }
 
-    /* Graph surfaces */
+    /* Graph */
     .canvas-container {
       position: relative;
       width: 100%;
@@ -439,7 +423,6 @@
       transform: translate(-50%, -50%);
     }
 
-    /* Data graph axis labels */
     .data-canvas-container::before,
     .data-canvas-container::after {
       position: absolute;
@@ -462,7 +445,7 @@
       top: 10px;
     }
 
-    /* Hyperparameter & Control: original font settings */
+    /* Hyperparameter & Control */
     .controls-card,
     .controls-card h2,
     .controls-card label,
@@ -526,7 +509,7 @@
       margin-right: 7px;
     }
 
-    /* Model State: original font settings */
+    /* Model State */
     .model-card {
       font-family: var(--economica);
     }
@@ -701,7 +684,6 @@
       overflow-wrap: anywhere;
     }
 
-    /* Responsive layout */
     @media (min-width: 1500px) {
       footer {
         padding-left: calc((100vw - 1440px) / 2);
@@ -779,10 +761,6 @@
         padding: 16px;
       }
 
-      .data-card .hint {
-        text-align: left;
-      }
-
       .toolbar {
         gap: 8px;
       }
@@ -797,10 +775,6 @@
 
       .members-grid {
         grid-template-columns: 1fr;
-      }
-
-      .control-group {
-        grid-template-columns: minmax(0, 1fr) 110px;
       }
 
       .btn-grid {
@@ -820,10 +794,7 @@
   </header>
 
   <main class="main-container">
-    <!-- Left column -->
     <div class="column column-left">
-
-      <!-- Data Canvas -->
       <section class="card data-card">
         <div class="panel-heading">
           <h2>Data Canvas / Input</h2>
@@ -841,22 +812,13 @@
 
           <div class="class-selector">
             <label class="class-option">
-              <input
-                type="radio"
-                name="classSelect"
-                value="1"
-                checked
-              >
+              <input type="radio" name="classSelect" value="1" checked>
               <span class="class-dot blue-dot"></span>
               <span>Class 1 (Blue)</span>
             </label>
 
             <label class="class-option">
-              <input
-                type="radio"
-                name="classSelect"
-                value="-1"
-              >
+              <input type="radio" name="classSelect" value="-1">
               <span class="class-dot orange-dot"></span>
               <span>Class 2 (Orange)</span>
             </label>
@@ -891,13 +853,11 @@
             value="35"
           >
           <output id="nozzleValue" for="nozzleSize">35 px</output>
-
           <span id="pointCount">0 points</span>
         </div>
 
         <div class="canvas-container data-canvas-container">
           <span id="brushCursor" aria-hidden="true"></span>
-
           <canvas
             id="dataCanvas"
             width="1200"
@@ -907,7 +867,6 @@
         </div>
       </section>
 
-      <!-- Hyperparameter & Control -->
       <section class="card controls-card">
         <h2>Hyperparameter &amp; Control</h2>
 
@@ -948,7 +907,6 @@
             type="number"
             value="3000"
             readonly
-            title="Fixed by the training logic"
           >
         </div>
 
@@ -960,10 +918,7 @@
       </section>
     </div>
 
-    <!-- Right column -->
     <div class="column">
-
-      <!-- Model State -->
       <section class="card model-card">
         <h2>Model State / Structure</h2>
 
@@ -981,7 +936,6 @@
           <p
             class="explanation update-description"
             id="updateDetails"
-            aria-live="polite"
           >Click STEP to inspect a weight update.</p>
         </div>
 
@@ -993,7 +947,6 @@
         </p>
       </section>
 
-      <!-- Loss Graph -->
       <section class="card loss-card">
         <div class="panel-heading">
           <h2>Loss Graph</h2>
@@ -1009,9 +962,7 @@
           ></canvas>
         </div>
 
-        <div class="stat-box" id="lossText">
-          Objective: 0.0000
-        </div>
+        <div class="stat-box" id="lossText">Objective: 0.0000</div>
       </section>
     </div>
   </main>
@@ -1033,37 +984,29 @@
     </div>
   </footer>
 
+  <!-- Embedded JavaScript Logic -->
   <script>
-    // Elements
-    const dataCanvas = document.getElementById("dataCanvas");
-    const dCtx = dataCanvas.getContext("2d");
+    // Elements Setup
+    const dataCanvas = document.getElementById('dataCanvas');
+    const dCtx = dataCanvas.getContext('2d');
+    const lossCanvas = document.getElementById('lossCanvas');
+    const lCtx = lossCanvas.getContext('2d');
 
-    const lossCanvas = document.getElementById("lossCanvas");
-    const lCtx = lossCanvas.getContext("2d");
+    const lrSlider = document.getElementById('lr');
+    const lrVal = document.getElementById('lrVal');
+    const cSlider = document.getElementById('cVal');
+    const cValDisp = document.getElementById('cValDisp');
 
-    const lrSlider = document.getElementById("lr");
-    const lrVal = document.getElementById("lrVal");
-    const cSlider = document.getElementById("cVal");
-    const cValDisp = document.getElementById("cValDisp");
+    const stepBtn = document.getElementById('stepBtn');
+    const playBtn = document.getElementById('playBtn');
+    const randBtn = document.getElementById('randBtn');
+    const clearBtn = document.getElementById('clearBtn');
 
-    const stepBtn = document.getElementById("stepBtn");
-    const playBtn = document.getElementById("playBtn");
-    const randBtn = document.getElementById("randBtn");
-    const clearBtn = document.getElementById("clearBtn");
+    const modelStateElem = document.getElementById('modelState');
+    const lossTextElem = document.getElementById('lossText');
 
-    const modelStateElem = document.getElementById("modelState");
-    const lossTextElem = document.getElementById("lossText");
-    const updateDetails = document.getElementById("updateDetails");
-
-    const brushTool = document.getElementById("brushTool");
-    const nozzleSize = document.getElementById("nozzleSize");
-    const nozzleValue = document.getElementById("nozzleValue");
-    const brushCursor = document.getElementById("brushCursor");
-    const deleteMode = document.getElementById("deleteMode");
-    const pointCount = document.getElementById("pointCount");
-
-    // Data and model state
-    let points = [];
+    // Data & Model State
+    let points = []; // Array of {x: [-1, 1], y: [-1, 1], label: 1 | -1}
     let w = [0.0, 0.0];
     let b = 0.0;
     let epoch = 0;
@@ -1072,32 +1015,13 @@
     let animationFrameId = null;
     let stableEpochs = 0;
     let lastLoss = Infinity;
-
     const MAX_EPOCHS = 3000;
-    const MAX_POINTS = 2000;
 
-    // Hyperparameter validation
-    lrSlider.addEventListener("change", () => {
-      lrSlider.value = Math.min(
-        0.1,
-        Math.max(0.001, Number(lrSlider.value) || 0.01)
-      );
+    // Synchronize Hyperparameter Labels
+    lrSlider.addEventListener('input', () => { lrVal.textContent = parseFloat(lrSlider.value).toFixed(3); resetModel(); });
+    cSlider.addEventListener('input', () => { cValDisp.textContent = parseFloat(cSlider.value).toFixed(1); resetModel(); });
 
-      lrVal.textContent = Number(lrSlider.value).toFixed(3);
-      resetModel();
-    });
-
-    cSlider.addEventListener("change", () => {
-      cSlider.value = Math.min(
-        10,
-        Math.max(0.1, Number(cSlider.value) || 1)
-      );
-
-      cValDisp.textContent = Number(cSlider.value).toFixed(1);
-      resetModel();
-    });
-
-    // Coordinate conversion
+    // Canvas Coordinates Conversion
     function canvasToMath(cx, cy) {
       return {
         x: (cx / dataCanvas.width) * 2 - 1,
@@ -1112,182 +1036,75 @@
       };
     }
 
-    // Random dataset
+    // Initialize Random Points
     function generateRandomPoints() {
       points = [];
-
       for (let i = 0; i < 15; i++) {
         points.push({
           x: Math.random() * 0.7 - 0.8,
           y: Math.random() * 0.8 - 0.4 + 0.3,
           label: 1
         });
-
         points.push({
           x: Math.random() * 0.7 + 0.1,
           y: Math.random() * 0.8 - 0.4 - 0.3,
           label: -1
         });
       }
-
       resetModel();
     }
 
-    // Spray and erase brush
-    let brushDown = false;
-    let lastStamp = -Infinity;
-
-    nozzleSize.addEventListener("input", () => {
-      nozzleValue.textContent = nozzleSize.value + " px";
-
-      brushCursor.style.width = nozzleSize.value + "px";
-      brushCursor.style.height = nozzleSize.value + "px";
-    });
-
-    function brushPosition(e) {
+    // Add / Delete Points Canvas Events
+    dataCanvas.addEventListener('click', (e) => {
       const rect = dataCanvas.getBoundingClientRect();
-
-      return {
-        rect,
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
-    }
-
-    function previewBrush(e) {
-      const { x, y } = brushPosition(e);
-      const diameter = Number(nozzleSize.value);
-
-      brushCursor.style.display = "block";
-      brushCursor.style.left = x + "px";
-      brushCursor.style.top = y + "px";
-      brushCursor.style.width = diameter + "px";
-      brushCursor.style.height = diameter + "px";
-    }
-
-    function stampBrush(e, forceErase = false) {
-      const { rect, x, y } = brushPosition(e);
-      const radius = Number(nozzleSize.value) / 2;
-      const erase = forceErase || deleteMode.checked;
-
-      if (erase) {
-        points = points.filter(p => {
-          const screenX = (p.x + 1) * rect.width / 2;
-          const screenY = (1 - p.y) * rect.height / 2;
-
-          return Math.hypot(screenX - x, screenY - y) > radius;
-        });
-      } else {
-        const spray = brushTool.value === "spray";
-
-        const label = Number(
-          document.querySelector(
-            'input[name="classSelect"]:checked'
-          ).value
-        );
-
-        const count = Math.min(
-          spray ? 6 : 1,
-          MAX_POINTS - points.length
-        );
-
-        for (let i = 0; i < count; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const r = spray
-            ? radius * Math.sqrt(Math.random())
-            : 0;
-
-          const px = x + r * Math.cos(angle);
-          const py = y + r * Math.sin(angle);
-
-          if (
-            px < 0 ||
-            py < 0 ||
-            px > rect.width ||
-            py > rect.height
-          ) {
-            continue;
-          }
-
-          points.push({
-            x: px / rect.width * 2 - 1,
-            y: 1 - py / rect.height * 2,
-            label
-          });
-        }
+      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
+      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
+      const mathPt = canvasToMath(cx, cy);
+      if (document.getElementById('deleteMode').checked) {
+        removePoint(mathPt);
+        return;
       }
-
+      const activeClass = parseInt(document.querySelector('input[name="classSelect"]:checked').value);
+      points.push({ x: mathPt.x, y: mathPt.y, label: activeClass });
       resetModel();
-    }
+    });
 
-    dataCanvas.addEventListener("pointerdown", e => {
-      if (e.button !== 0) return;
-
+    dataCanvas.addEventListener('contextmenu', (e) => {
       e.preventDefault();
-      brushDown = true;
-      lastStamp = e.timeStamp;
+      const rect = dataCanvas.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
+      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
+      const mathPt = canvasToMath(cx, cy);
 
-      dataCanvas.setPointerCapture(e.pointerId);
-      previewBrush(e);
-      stampBrush(e);
+      removePoint(mathPt);
     });
 
-    dataCanvas.addEventListener("pointermove", e => {
-      previewBrush(e);
-
-      if (!brushDown || e.timeStamp - lastStamp < 30) return;
-
-      if (brushTool.value === "spray" || deleteMode.checked) {
-        stampBrush(e);
-        lastStamp = e.timeStamp;
-      }
-    });
-
-    for (const event of [
-      "pointerup",
-      "pointercancel",
-      "lostpointercapture"
-    ]) {
-      dataCanvas.addEventListener(event, () => {
-        brushDown = false;
+    function removePoint(mathPt) {
+      let nearest = -1, distance = Infinity;
+      points.forEach((p, i) => {
+        const d = Math.hypot(p.x - mathPt.x, p.y - mathPt.y);
+        if (d < distance) { distance = d; nearest = i; }
       });
+      if (distance < 0.08) {
+        points.splice(nearest, 1);
+        resetModel();
+      }
     }
 
-    dataCanvas.addEventListener("pointerleave", () => {
-      brushCursor.style.display = "none";
-    });
-
-    dataCanvas.addEventListener("contextmenu", e => {
-      e.preventDefault();
-      stampBrush(e, true);
-    });
-
-    // Full-batch subgradient descent
+    // Full-batch subgradient descent on the displayed soft-margin objective.
     function trainStep() {
-      const hasPositive = points.some(p => p.label === 1);
-      const hasNegative = points.some(p => p.label === -1);
-
-      if (!hasPositive || !hasNegative) {
+      if (!points.some(p => p.label === 1) || !points.some(p => p.label === -1)) {
         if (isPlaying) togglePlay();
-
-        lossTextElem.textContent =
-          "Add at least one point from each class to train.";
-
+        lossTextElem.textContent = 'Add at least one point from each class to train.';
         return;
       }
 
       const lr = parseFloat(lrSlider.value);
       const C = parseFloat(cSlider.value);
-
-      let gradW0 = w[0];
-      let gradW1 = w[1];
-      let gradB = 0;
+      let gradW0 = w[0], gradW1 = w[1], gradB = 0;
       let active = 0;
-
       for (const p of points) {
-        const margin =
-          p.label * (w[0] * p.x + w[1] * p.y + b);
-
+        const margin = p.label * (w[0] * p.x + w[1] * p.y + b);
         if (margin < 1) {
           gradW0 -= C * p.label * p.x / points.length;
           gradW1 -= C * p.label * p.y / points.length;
@@ -1295,63 +1112,30 @@
           active++;
         }
       }
-
-      const previousW = [...w];
-      const previousB = b;
-      const previousLoss = computeHingeLoss();
-
       w[0] -= lr * gradW0;
       w[1] -= lr * gradW1;
       b -= lr * gradB;
       epoch++;
-
       const currentLoss = computeHingeLoss();
       lossHistory.push(currentLoss);
-
-      stableEpochs =
-        Math.abs(lastLoss - currentLoss) < 0.00005
-          ? stableEpochs + 1
-          : 0;
-
+      stableEpochs = Math.abs(lastLoss - currentLoss) < 0.00005 ? stableEpochs + 1 : 0;
       lastLoss = currentLoss;
-
       updateUI();
-
-      const f = value => value.toFixed(5);
-
-      updateDetails.textContent =
-        `Epoch ${epoch}: ${active} of ${points.length} points have y(w·x+b) < 1.\n` +
-        `These points contribute to the hinge-loss gradient.\n\n` +
-        `Update: new value = old value − learning rate × gradient\n` +
-        `w₁: ${f(previousW[0])} − ${lr} × (${f(gradW0)}) = ${f(w[0])}\n` +
-        `w₂: ${f(previousW[1])} − ${lr} × (${f(gradW1)}) = ${f(w[1])}\n` +
-        `b: ${f(previousB)} − ${lr} × (${f(gradB)}) = ${f(b)}\n\n` +
-        `Objective: ${f(previousLoss)} → ${f(currentLoss)}`;
-
-      lossTextElem.textContent +=
-        ` · ${active} margin violator${active === 1 ? "" : "s"} updated the model.`;
-
+      lossTextElem.textContent += ` · ${active} margin violator${active === 1 ? '' : 's'} updated the model.`;
       if (stableEpochs >= 20 || epoch >= MAX_EPOCHS) {
         if (isPlaying) togglePlay();
-
-        lossTextElem.textContent +=
-          stableEpochs >= 20
-            ? " Converged."
-            : " Reached epoch limit.";
+        lossTextElem.textContent += stableEpochs >= 20 ? ' Converged.' : ' Reached epoch limit.';
       }
     }
 
     function computeHingeLoss() {
       if (points.length === 0) return 0;
-
       const C = parseFloat(cSlider.value);
-      const reg = 0.5 * (w[0] * w[0] + w[1] * w[1]);
+      let reg = 0.5 * (w[0] * w[0] + w[1] * w[1]);
       let hinge = 0;
 
-      for (const p of points) {
-        const margin =
-          p.label * (w[0] * p.x + w[1] * p.y + b);
-
+      for (let p of points) {
+        let margin = p.label * (w[0] * p.x + w[1] * p.y + b);
         hinge += Math.max(0, 1 - margin);
       }
 
@@ -1359,28 +1143,18 @@
     }
 
     function resetModel() {
-      updateDetails.textContent =
-        "Click STEP to inspect a weight update. " +
-        "The weights shrink through regularization; " +
-        "points inside the margin also contribute to the gradient.";
-
       w = [0.0, 0.0];
       b = 0.0;
       epoch = 0;
       lossHistory = [];
       stableEpochs = 0;
       lastLoss = Infinity;
-
       if (isPlaying) togglePlay();
-
       updateUI();
     }
 
-    // Update model state and graphs
+    // UI Updates & Visualizations
     function updateUI() {
-      pointCount.textContent =
-        points.length + " / " + MAX_POINTS + " points";
-
       drawDataCanvas();
       drawLossCanvas();
 
@@ -1392,47 +1166,37 @@
       `;
 
       const curLoss = computeHingeLoss();
-
-      const support = points.filter(p =>
-        p.label * (w[0] * p.x + w[1] * p.y + b) <= 1.001
-      ).length;
-
-      lossTextElem.textContent =
-        `Objective: ${curLoss.toFixed(4)} · ` +
-        `${support} point${support === 1 ? "" : "s"} on or inside the margin`;
+      const support = points.filter(p => p.label * (w[0] * p.x + w[1] * p.y + b) <= 1.001).length;
+      lossTextElem.textContent = `Objective: ${curLoss.toFixed(4)} · ${support} point${support === 1 ? '' : 's'} on or inside the margin`;
     }
 
-    // Draw data points, decision boundary, and margins
+    // Draw Data Canvas (Points + SVM Boundary)
     function drawDataCanvas() {
       dCtx.clearRect(0, 0, dataCanvas.width, dataCanvas.height);
 
-      dCtx.strokeStyle = "#334155";
+      // Draw Grid / Axes
+      dCtx.strokeStyle = '#334155';
       dCtx.lineWidth = 1;
       dCtx.beginPath();
-
-      dCtx.moveTo(dataCanvas.width / 2, 0);
-      dCtx.lineTo(dataCanvas.width / 2, dataCanvas.height);
-
-      dCtx.moveTo(0, dataCanvas.height / 2);
-      dCtx.lineTo(dataCanvas.width, dataCanvas.height / 2);
-
+      dCtx.moveTo(dataCanvas.width / 2, 0); dCtx.lineTo(dataCanvas.width / 2, dataCanvas.height);
+      dCtx.moveTo(0, dataCanvas.height / 2); dCtx.lineTo(dataCanvas.width, dataCanvas.height / 2);
       dCtx.stroke();
 
+      // Draw SVM Boundary Lines (Hyperplane & Margins)
       if (w[0] !== 0 || w[1] !== 0) {
-        drawLine(0, "#38bdf8", 2);
-        drawLine(1, "#94a3b8", 1, [4, 4]);
-        drawLine(-1, "#94a3b8", 1, [4, 4]);
+        drawLine(0, '#38bdf8', 2);  // Hyperplane: w.x + b = 0
+        drawLine(1, '#94a3b8', 1, [4, 4]);  // Positive Margin: w.x + b = 1
+        drawLine(-1, '#94a3b8', 1, [4, 4]); // Negative Margin: w.x + b = -1
       }
 
-      for (const p of points) {
+      // Draw Data Points
+      for (let p of points) {
         const { cx, cy } = mathToCanvas(p.x, p.y);
-
         dCtx.beginPath();
         dCtx.arc(cx, cy, 6, 0, 2 * Math.PI);
-        dCtx.fillStyle = p.label === 1 ? "#38bdf8" : "#fb923c";
+        dCtx.fillStyle = p.label === 1 ? '#38bdf8' : '#fb923c';
         dCtx.fill();
-
-        dCtx.strokeStyle = "#020617";
+        dCtx.strokeStyle = '#020617';
         dCtx.lineWidth = 1.5;
         dCtx.stroke();
       }
@@ -1445,16 +1209,12 @@
       dCtx.setLineDash(dash);
       dCtx.beginPath();
 
-      const x1 = -1;
-      const y1 =
-        (offset - b - w[0] * x1) / (w[1] || 0.0001);
+      // Line Equation: w0*x + w1*y + b = offset  =>  y = (offset - b - w0*x) / w1
+      let x1 = -1, y1 = (offset - b - w[0] * x1) / (w[1] || 0.0001);
+      let x2 = 1, y2 = (offset - b - w[0] * x2) / (w[1] || 0.0001);
 
-      const x2 = 1;
-      const y2 =
-        (offset - b - w[0] * x2) / (w[1] || 0.0001);
-
-      const p1 = mathToCanvas(x1, y1);
-      const p2 = mathToCanvas(x2, y2);
+      let p1 = mathToCanvas(x1, y1);
+      let p2 = mathToCanvas(x2, y2);
 
       dCtx.moveTo(p1.cx, p1.cy);
       dCtx.lineTo(p2.cx, p2.cy);
@@ -1462,7 +1222,7 @@
       dCtx.restore();
     }
 
-    // Draw loss history
+    // Draw Loss Tracking Graph
     function drawLossCanvas() {
       lCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
 
@@ -1470,73 +1230,304 @@
 
       const maxLoss = Math.max(...lossHistory, 1.0);
       const padding = 20;
-      const plotWidth = lossCanvas.width - padding * 2;
-      const plotHeight = lossCanvas.height - padding * 2;
+      const w = lossCanvas.width - padding * 2;
+      const h = lossCanvas.height - padding * 2;
 
-      lCtx.strokeStyle = "#ef4444";
+      lCtx.strokeStyle = '#ef4444';
       lCtx.lineWidth = 2;
       lCtx.beginPath();
 
       for (let i = 0; i < lossHistory.length; i++) {
-        const x =
-          padding + (i / (lossHistory.length - 1)) * plotWidth;
+        const x = padding + (i / (lossHistory.length - 1)) * w;
+        const y = lossCanvas.height - padding - (lossHistory[i] / maxLoss) * h;
 
-        const y =
-          lossCanvas.height -
-          padding -
-          (lossHistory[i] / maxLoss) * plotHeight;
-
-        if (i === 0) {
-          lCtx.moveTo(x, y);
-        } else {
-          lCtx.lineTo(x, y);
-        }
+        if (i === 0) lCtx.moveTo(x, y);
+        else lCtx.lineTo(x, y);
       }
-
       lCtx.stroke();
     }
 
-    // Automatic training
+    // Play Loop
     function togglePlay() {
       isPlaying = !isPlaying;
-
-      playBtn.textContent =
-        isPlaying ? "Pause" : "Play until Convergence";
-
-      playBtn.classList.toggle("primary", isPlaying);
+      playBtn.textContent = isPlaying ? 'Pause' : 'Play until Convergence';
+      playBtn.classList.toggle('primary', isPlaying);
 
       if (isPlaying) {
         function loop() {
           if (!isPlaying) return;
-
           trainStep();
-
-          if (isPlaying) {
-            animationFrameId = requestAnimationFrame(loop);
-          }
+          if (isPlaying) animationFrameId = requestAnimationFrame(loop);
         }
-
         loop();
       } else {
         cancelAnimationFrame(animationFrameId);
       }
     }
 
-    // Control events
-    stepBtn.addEventListener("click", trainStep);
-    playBtn.addEventListener("click", togglePlay);
-    randBtn.addEventListener("click", generateRandomPoints);
-
-    document.getElementById("resetBtn")
-      .addEventListener("click", resetModel);
-
-    clearBtn.addEventListener("click", () => {
+    // Controls Event Listeners
+    stepBtn.addEventListener('click', trainStep);
+    playBtn.addEventListener('click', togglePlay);
+    randBtn.addEventListener('click', generateRandomPoints);
+    document.getElementById('resetBtn').addEventListener('click', resetModel);
+    clearBtn.addEventListener('click', () => {
       points = [];
       resetModel();
     });
 
-    // Initialize
+    // Initialize App
     generateRandomPoints();
+  </script>
+
+  <!-- Additional features: original functions above are not replaced -->
+  <script>
+    (() => {
+      const tool = document.getElementById("brushTool");
+      const nozzle = document.getElementById("nozzleSize");
+      const nozzleOutput = document.getElementById("nozzleValue");
+      const cursor = document.getElementById("brushCursor");
+      const eraseToggle = document.getElementById("deleteMode");
+      const counter = document.getElementById("pointCount");
+      const details = document.getElementById("updateDetails");
+
+      const POINT_LIMIT = 2000;
+      let dragging = false;
+      let lastStampTime = -Infinity;
+      let suppressClick = false;
+
+      function brushEnabled() {
+        return tool.value === "spray" || eraseToggle.checked;
+      }
+
+      function pointerPosition(event) {
+        const rect = dataCanvas.getBoundingClientRect();
+
+        return {
+          rect,
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top
+        };
+      }
+
+      function showCursor(event) {
+        if (!brushEnabled()) {
+          cursor.style.display = "none";
+          return;
+        }
+
+        const { x, y } = pointerPosition(event);
+
+        cursor.style.display = "block";
+        cursor.style.left = x + "px";
+        cursor.style.top = y + "px";
+        cursor.style.width = nozzle.value + "px";
+        cursor.style.height = nozzle.value + "px";
+      }
+
+      nozzle.addEventListener("input", () => {
+        nozzleOutput.textContent = nozzle.value + " px";
+        cursor.style.width = nozzle.value + "px";
+        cursor.style.height = nozzle.value + "px";
+      });
+
+      tool.addEventListener("change", () => {
+        cursor.style.display = "none";
+      });
+
+      eraseToggle.addEventListener("change", () => {
+        cursor.style.display = "none";
+      });
+
+      function applyBrush(event) {
+        const { rect, x, y } = pointerPosition(event);
+
+        if (
+          x < 0 || y < 0 ||
+          x > rect.width || y > rect.height
+        ) {
+          return;
+        }
+
+        const radius = Number(nozzle.value) / 2;
+        let changed = false;
+
+        if (eraseToggle.checked) {
+          const remaining = points.filter(point => {
+            const px = (point.x + 1) * rect.width / 2;
+            const py = (1 - point.y) * rect.height / 2;
+
+            return Math.hypot(px - x, py - y) > radius;
+          });
+
+          changed = remaining.length !== points.length;
+          points = remaining;
+        } else {
+          const label = Number(
+            document.querySelector(
+              'input[name="classSelect"]:checked'
+            ).value
+          );
+
+          const count = Math.min(6, POINT_LIMIT - points.length);
+
+          for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = radius * Math.sqrt(Math.random());
+
+            const px = x + Math.cos(angle) * distance;
+            const py = y + Math.sin(angle) * distance;
+
+            if (
+              px < 0 || py < 0 ||
+              px > rect.width || py > rect.height
+            ) {
+              continue;
+            }
+
+            points.push({
+              x: px / rect.width * 2 - 1,
+              y: 1 - py / rect.height * 2,
+              label
+            });
+
+            changed = true;
+          }
+        }
+
+        if (changed) resetModel();
+      }
+
+      dataCanvas.addEventListener("pointerdown", event => {
+        if (event.button !== 0) return;
+
+        suppressClick = false;
+
+        // Single-point clicks continue to use the original handler.
+        if (!brushEnabled()) return;
+
+        event.preventDefault();
+
+        dragging = true;
+        suppressClick = true;
+        lastStampTime = event.timeStamp;
+
+        dataCanvas.setPointerCapture(event.pointerId);
+        showCursor(event);
+        applyBrush(event);
+      });
+
+      dataCanvas.addEventListener("pointermove", event => {
+        showCursor(event);
+
+        if (!dragging || event.timeStamp - lastStampTime < 30) {
+          return;
+        }
+
+        applyBrush(event);
+        lastStampTime = event.timeStamp;
+      });
+
+      for (const eventName of [
+        "pointerup",
+        "pointercancel",
+        "lostpointercapture"
+      ]) {
+        dataCanvas.addEventListener(eventName, () => {
+          dragging = false;
+        });
+      }
+
+      dataCanvas.addEventListener("pointerleave", () => {
+        cursor.style.display = "none";
+      });
+
+      // Avoid adding an extra point after a brush gesture.
+      // The original single-point handler remains unchanged.
+      dataCanvas.addEventListener("click", event => {
+        if (
+          suppressClick ||
+          brushEnabled() ||
+          points.length >= POINT_LIMIT
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          suppressClick = false;
+        }
+      }, true);
+
+      // Observe the original model display to show its actual updates.
+      // No training functions or event handlers are replaced.
+      function snapshot() {
+        return {
+          epoch,
+          weights: [...w],
+          bias: b,
+          loss: computeHingeLoss()
+        };
+      }
+
+      let previous = snapshot();
+
+      function updateAdditionalDisplay() {
+        counter.textContent =
+          points.length + " / " + POINT_LIMIT + " points";
+
+        const current = snapshot();
+
+        if (epoch === 0) {
+          details.textContent =
+            "Click STEP to inspect a weight update.\n\n" +
+            "The model balances smaller weights with reducing " +
+            "violations of the margin condition y(w·x+b) ≥ 1.";
+        } else if (epoch === previous.epoch + 1) {
+          const rate = Number(lrSlider.value);
+          const f = value => value.toFixed(5);
+
+          const gradientW0 =
+            (previous.weights[0] - w[0]) / rate;
+
+          const gradientW1 =
+            (previous.weights[1] - w[1]) / rate;
+
+          const gradientB =
+            (previous.bias - b) / rate;
+
+          const violating = points.filter(point =>
+            point.label * (
+              previous.weights[0] * point.x +
+              previous.weights[1] * point.y +
+              previous.bias
+            ) < 1
+          ).length;
+
+          details.textContent =
+            `Epoch ${epoch}: ${violating} of ${points.length} points violated the margin before this update.\n\n` +
+            "New value = old value − learning rate × gradient\n" +
+            `w₁: ${f(previous.weights[0])} − ${rate} × (${f(gradientW0)}) = ${f(w[0])}\n` +
+            `w₂: ${f(previous.weights[1])} − ${rate} × (${f(gradientW1)}) = ${f(w[1])}\n` +
+            `b: ${f(previous.bias)} − ${rate} × (${f(gradientB)}) = ${f(b)}\n\n` +
+            `Objective: ${f(previous.loss)} → ${f(current.loss)}`;
+        } else if (epoch !== previous.epoch) {
+          details.textContent =
+            `Epoch ${epoch}\n` +
+            `Weights: [${w[0].toFixed(5)}, ${w[1].toFixed(5)}]\n` +
+            `Bias: ${b.toFixed(5)}\n` +
+            `Objective: ${current.loss.toFixed(5)}`;
+        }
+
+        previous = current;
+      }
+
+      const observer = new MutationObserver(updateAdditionalDisplay);
+
+      observer.observe(modelStateElem, {
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+
+      updateAdditionalDisplay();
+    })();
   </script>
 </body>
 </html>
