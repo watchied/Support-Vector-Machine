@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear SVM Visualizer - CEI KMITL</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Carter+One&family=Economica:wght@400;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      color-scheme: dark;
+      --orange: #f58000;
+      --economica: "Economica", "Arial Narrow", sans-serif;
+    }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 3vw 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Header */
+    header {
+      flex-shrink: 0;
+      padding: 10px 0 30px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin-bottom: 6px;
+      font-family: var(--economica);
+      font-size: 40px;
+      font-weight: 700;
+    }
+
+    header p {
+      color: #ddd;
+      font-family: var(--economica);
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    /* Main layout: top panels share the same height */
+    .main-container {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto auto;
+      align-content: start;
+      align-items: stretch;
+      flex: 1 0 auto;
+      gap: 16px 22px;
+      width: 100%;
+      max-width: 1440px;
+      min-height: 0;
+      margin: 0 auto 26px;
+    }
+
+    .column {
+      display: contents;
+    }
+
+    .data-card {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .model-card {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .controls-card {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: start;
+    }
+
+    .loss-card {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: start;
+    }
+
+    /* Shared panels */
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+      padding: 18px 20px;
+      background: #252525;
+      border: 1px solid #454545;
+      border-radius: 24px;
+    }
+
+    h2 {
+      font-family: var(--economica);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      padding: 6px 9px;
+      color: #fff;
+      background: #66605a;
+      border: 1px solid #94908a;
+      border-radius: 4px;
+      font: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    button:hover {
+      background: #8a7460;
+    }
+
+    button.primary,
+    #playBtn,
+    #resetBtn,
+    #randBtn {
+      background: var(--orange);
+      border-color: #ffb05a;
+    }
+
+    button.primary:hover,
+    #playBtn:hover,
+    #resetBtn:hover,
+    #randBtn:hover {
+      background: #ff991f;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 2px solid #ffd28e;
+      outline-offset: 3px;
+    }
+
+    /* Data Canvas / Input */
+    .data-card {
+      padding: 20px 24px 18px;
+      border: 1px solid #665c50;
+      border-radius: 28px;
+      background: linear-gradient(
+        115deg,
+        #60605d 0%,
+        #634421 45%,
+        #402000 78%,
+        #191919 100%
+      );
+      font-family: var(--economica);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .data-card .panel-heading {
+      align-items: baseline;
+      gap: 8px 16px;
+    }
+
+    .data-card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .data-card .hint {
+      color: #eee4d8;
+      font-family: var(--economica);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    /* Data toolbar */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .data-card .toolbar button,
+    .class-caption,
+    .class-option,
+    .mode-switch label {
+      font-family: var(--economica);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .data-card .toolbar button {
+      min-height: 32px;
+      padding: 6px 13px;
+      border: 1px solid #b6a38b;
+      border-radius: 5px;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px #0003;
+    }
+
+    .data-card #randBtn {
+      background: #f58000;
+      border-color: #ffd39f;
+    }
+
+    .data-card #randBtn:hover {
+      background: #ff971e;
+    }
+
+    .data-card #clearBtn {
+      background: #817466;
+      border-color: #938676;
+    }
+
+    .data-card #clearBtn:hover {
+      background: #958574;
+    }
+
+    .toolbar-divider {
+      flex-shrink: 0;
+      width: 1px;
+      height: 27px;
+      margin: 0 2px;
+      background: #d7c8b5;
+    }
+
+    /* Class selection */
+    .class-selector {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .class-option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      padding: 6px 9px;
+      color: #fff;
+      background: #786047;
+      border: 1px solid #a18c72;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px #0003;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .class-option:has(input:checked) {
+      background: #8e7558;
+      border-color: #e8d7bc;
+    }
+
+    .class-option:hover {
+      background: #947b5e;
+    }
+
+    .class-option input,
+    .mode-switch input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .class-option:has(input:focus-visible),
+    .mode-switch:has(input:focus-visible) {
+      outline: 2px solid #ffd28e;
+      outline-offset: 3px;
+    }
+
+    .class-dot {
+      flex-shrink: 0;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+    }
+
+    .blue-dot {
+      background: #38bdf8;
+    }
+
+    .orange-dot {
+      background: #fb923c;
+    }
+
+    /* ADD / DELETE switch */
+    .mode-switch {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      min-height: 32px;
+      margin-left: auto;
+      background: #695744;
+      border: 1px solid #9e8b72;
+      border-radius: 6px;
+    }
+
+    .mode-switch label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 55px;
+      padding: 6px 10px;
+      color: #fff;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .mode-switch input:not(:checked) ~ .add-mode {
+      background: #a79885;
+      box-shadow: inset 0 0 0 1px #c4b49d;
+      pointer-events: none;
+    }
+
+    .mode-switch input:checked ~ .delete-mode {
+      background: #a79885;
+      box-shadow: inset 0 0 0 1px #c4b49d;
+      pointer-events: none;
+    }
+
+    /* Graph surfaces */
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(255, 183, 100, 0.25);
+      border-radius: 20px;
+      background-color: #181614;
+      background-image:
+        linear-gradient(
+          rgba(255, 255, 255, 0.045) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.045) 1px,
+          transparent 1px
+        ),
+        radial-gradient(
+          ellipse at top left,
+          rgba(245, 128, 0, 0.12),
+          transparent 70%
+        );
+      background-size:
+        10% 10%,
+        10% 10%,
+        100% 100%;
+      box-shadow:
+        inset 0 0 35px rgba(0, 0, 0, 0.3),
+        0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Match the 1200 × 800 canvas ratio to prevent oval points */
+    .data-card .data-canvas-container {
+      flex: 0 0 auto;
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      aspect-ratio: 3 / 2;
+      margin-block: auto;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #dataCanvas {
+      position: absolute;
+      inset: 0;
+      cursor: crosshair;
+    }
+
+    /* Data graph axis labels */
+    .data-canvas-container::before,
+    .data-canvas-container::after {
+      position: absolute;
+      z-index: 1;
+      color: #c4b6a4;
+      font-family: var(--economica);
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    .data-canvas-container::before {
+      content: "x₁";
+      right: 12px;
+      top: calc(50% + 8px);
+    }
+
+    .data-canvas-container::after {
+      content: "x₂";
+      left: calc(50% + 10px);
+      top: 10px;
+    }
+
+    /* Hyperparameter & Control */
+    .controls-card,
+    .controls-card h2,
+    .controls-card label,
+    .controls-card input,
+    .controls-card button {
+      font-family: var(--economica);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .controls-card h2 {
+      margin-bottom: 3px;
+    }
+
+    .control-group {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(95px, 145px);
+      align-items: center;
+      gap: 14px;
+    }
+
+    .control-group input {
+      width: 100%;
+      min-width: 0;
+      padding: 6px 12px;
+      color: #fff;
+      background: #575757;
+      border: 1px solid #898989;
+      border-radius: 3px;
+    }
+
+    .control-group input[readonly] {
+      color: #c7c7c7;
+    }
+
+    .value-label {
+      display: none;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 2fr)
+        minmax(0, 1fr);
+      gap: 10px;
+      margin-top: 3px;
+      padding-top: 13px;
+      border-top: 1px solid #777;
+    }
+
+    .btn-grid button {
+      min-width: 0;
+      padding: 8px 5px;
+      white-space: normal;
+    }
+
+    #playBtn::before {
+      content: "▷";
+      margin-right: 7px;
+    }
+
+    /* Model State */
+    .model-card {
+      font-family: var(--economica);
+    }
+
+    .model-card h2 {
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    .model-label {
+      font-family: var(--economica);
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.3;
+    }
+
+    .stat-box {
+      padding: 10px 12px;
+      background: #050505;
+      border: 1px solid #898989;
+      border-radius: 4px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    #modelState {
+      color: #fff;
+      background: linear-gradient(110deg, #e77900, #f58a00);
+      border-color: #ffac56;
+      font-family: var(--economica);
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .explanation {
+      color: #ddd;
+      font-family: var(--economica);
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .formula {
+      display: block;
+      margin-top: 7px;
+      padding: 8px 12px;
+      color: #eee;
+      background: #050505;
+      border: 1px solid #888;
+      border-radius: 4px;
+      font-family: var(--economica);
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .current-update {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .update-description {
+      padding: 8px 12px;
+      background: #050505;
+      border: 1px solid #888;
+      border-radius: 4px;
+    }
+
+    /* Loss Graph */
+    .loss-card {
+      font-family: var(--economica);
+      background: linear-gradient(
+        115deg,
+        #54514e 0%,
+        #593000 58%,
+        #242424 100%
+      );
+    }
+
+    .status {
+      color: #eadcca;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .loss-card .canvas-container {
+      height: auto;
+      aspect-ratio: 8 / 5;
+    }
+
+    #lossCanvas {
+      position: absolute;
+      inset: 0;
+    }
+
+    #lossText {
+      background: #17120ddd;
+      border-color: #7b6951;
+      font-family: var(--economica);
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      flex-shrink: 0;
+      align-items: center;
+      gap: 40px;
+      padding: 20px 32px 24px;
+      margin: auto -3vw 0;
+      background: linear-gradient(
+        180deg,
+        #000 0%,
+        #000 48%,
+        #6f3700 78%,
+        #f58000 100%
+      );
+      font-size: 12px;
+    }
+
+    .brand {
+      font-family: "Carter One", cursive;
+      font-size: 40px;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .brand span {
+      color: #ff8500;
+    }
+
+    .members {
+      width: 100%;
+      max-width: 1100px;
+      min-width: 0;
+    }
+
+    .members-title {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #ddd;
+      font-size: 14px;
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px 30px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    /* Responsive layout */
+    @media (min-width: 1500px) {
+      footer {
+        padding-left: calc((100vw - 1440px) / 2);
+      }
+    }
+
+    @media (max-width: 1000px) {
+      footer {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 20px 15px 0;
+      }
+
+      .main-container {
+        column-gap: 12px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      .control-group {
+        grid-template-columns: minmax(0, 1fr) 110px;
+      }
+
+      footer {
+        padding: 20px;
+        margin-left: -15px;
+        margin-right: -15px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      header {
+        padding: 8px 0 24px;
+      }
+
+      header p {
+        max-width: 320px;
+        margin: auto;
+      }
+
+      .main-container {
+        display: block;
+      }
+
+      .column {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+
+      .data-card {
+        padding: 16px;
+      }
+
+      .data-card .hint {
+        text-align: left;
+      }
+
+      .toolbar {
+        gap: 8px;
+      }
+
+      .toolbar-divider {
+        display: none;
+      }
+
+      .data-card .data-canvas-container {
+        margin-block: 0;
+      }
+
+      .members-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .control-group {
+        grid-template-columns: minmax(0, 1fr) 110px;
+      }
+
+      .btn-grid {
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Linear SVM Visualizer</h1>
+    <p>
+      Learn how a linear Support Vector Machine (SVM) separates two
+      classes with a wide margin
+    </p>
+  </header>
+
+  <main class="main-container">
+    <!-- Left column -->
+    <div class="column column-left">
+
+      <!-- Data Canvas -->
+      <section class="card data-card">
+        <div class="panel-heading">
+          <h2>Data Canvas / Input</h2>
+          <span class="hint">
+            Click to add point - Select Delete to remove
+          </span>
+        </div>
+
+        <div class="toolbar">
+          <button id="randBtn" type="button">Random Data</button>
+          <button id="clearBtn" type="button">Clear</button>
+
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <span class="class-caption">Class</span>
+
+          <div class="class-selector">
+            <label class="class-option">
+              <input
+                type="radio"
+                name="classSelect"
+                value="1"
+                checked
+              >
+              <span class="class-dot blue-dot"></span>
+              <span>Class 1 (Blue)</span>
+            </label>
+
+            <label class="class-option">
+              <input
+                type="radio"
+                name="classSelect"
+                value="-1"
+              >
+              <span class="class-dot orange-dot"></span>
+              <span>Class 2 (Orange)</span>
+            </label>
+          </div>
+
+          <span class="toolbar-divider" aria-hidden="true"></span>
+
+          <div class="mode-switch">
+            <input
+              type="checkbox"
+              id="deleteMode"
+              aria-label="Delete mode; uncheck to add points"
+            >
+            <label for="deleteMode" class="add-mode">ADD</label>
+            <label for="deleteMode" class="delete-mode">DELETE</label>
+          </div>
+        </div>
+
+        <div class="canvas-container data-canvas-container">
+          <canvas
+            id="dataCanvas"
+            width="1200"
+            height="800"
+            aria-label="Interactive SVM data points and decision boundary"
+          ></canvas>
+        </div>
+      </section>
+
+      <!-- Hyperparameter & Control -->
+      <section class="card controls-card">
+        <h2>Hyperparameter & Control</h2>
+
+        <div class="control-group">
+          <label for="cVal">
+            C (regularization)
+            <span class="value-label" id="cValDisp">1.0</span>
+          </label>
+          <input
+            type="number"
+            id="cVal"
+            min="0.1"
+            max="10"
+            step="0.1"
+            value="1.0"
+          >
+        </div>
+
+        <div class="control-group">
+          <label for="lr">
+            Learning rate
+            <span class="value-label" id="lrVal">0.01</span>
+          </label>
+          <input
+            type="number"
+            id="lr"
+            min="0.001"
+            max="0.1"
+            step="0.001"
+            value="0.01"
+          >
+        </div>
+
+        <div class="control-group">
+          <label for="epochLimit">Max epochs (fixed)</label>
+          <input
+            id="epochLimit"
+            type="number"
+            value="3000"
+            readonly
+            title="Fixed by the original training logic"
+          >
+        </div>
+
+        <div class="btn-grid">
+          <button id="stepBtn" class="primary">STEP</button>
+          <button id="playBtn">Play until Convergence</button>
+          <button id="resetBtn">Reset</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right column -->
+    <div class="column">
+
+      <!-- Model State -->
+      <section class="card model-card">
+        <h2>Model State / Structure</h2>
+
+        <div class="model-label">Weight vector & parameters</div>
+
+        <div class="stat-box" id="modelState">
+          Epoch: 0<br>
+          Weights (w): [0.000, 0.000]<br>
+          Bias (b): 0.000<br>
+          Hyperplane: 0.00x₁ + 0.00x₂ + 0.00 = 0
+        </div>
+
+        <div class="current-update">
+          <div class="model-label">Current update</div>
+          <p class="explanation update-description">
+            Each training step adjusts the weights and bias to reduce
+            margin violations while keeping the weight vector small.
+            Step-specific results appear below the loss graph.
+          </p>
+        </div>
+
+        <p class="explanation">
+          Training objective
+          <span class="formula">
+            ½ ‖w‖² + C · mean(max(0, 1 − yᵢ(w · xᵢ + b)))
+          </span>
+        </p>
+      </section>
+
+      <!-- Loss Graph -->
+      <section class="card loss-card">
+        <div class="panel-heading">
+          <h2>Loss Graph</h2>
+          <span class="status">SVM objective</span>
+        </div>
+
+        <div class="canvas-container">
+          <canvas
+            id="lossCanvas"
+            width="400"
+            height="250"
+            aria-label="SVM objective over training epochs"
+          ></canvas>
+        </div>
+
+        <div class="stat-box" id="lossText">
+          Objective: 0.0000
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="brand">CEI <span>KMITL</span></div>
+
+    <div class="members">
+      <div class="members-title">Group Member</div>
+
+      <div class="members-grid">
+        <span>Patchpakintr Chiwkha 67011242</span>
+        <span>Kittisak Chalongkulwat 67011613</span>
+        <span>Watcharathorn Krachangmon 67011380</span>
+        <span>Sirawich Sromcheep 67011655</span>
+        <span>Worawalun Sombutphotiudom 67011385</span>
+        <span>Techin Lohapongpan 67011660</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Embedded JavaScript Logic -->
+  <script>
+    // Elements Setup
+    const dataCanvas = document.getElementById('dataCanvas');
+    const dCtx = dataCanvas.getContext('2d');
+    const lossCanvas = document.getElementById('lossCanvas');
+    const lCtx = lossCanvas.getContext('2d');
+
+    const lrSlider = document.getElementById('lr');
+    const lrVal = document.getElementById('lrVal');
+    const cSlider = document.getElementById('cVal');
+    const cValDisp = document.getElementById('cValDisp');
+
+    const stepBtn = document.getElementById('stepBtn');
+    const playBtn = document.getElementById('playBtn');
+    const randBtn = document.getElementById('randBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const modelStateElem = document.getElementById('modelState');
+    const lossTextElem = document.getElementById('lossText');
+
+    // Data & Model State
+    let points = []; // Array of {x: [-1, 1], y: [-1, 1], label: 1 | -1}
+    let w = [0.0, 0.0];
+    let b = 0.0;
+    let epoch = 0;
+    let lossHistory = [];
+    let isPlaying = false;
+    let animationFrameId = null;
+    let stableEpochs = 0;
+    let lastLoss = Infinity;
+    const MAX_EPOCHS = 3000;
+
+    // Synchronize Hyperparameter Labels
+    lrSlider.addEventListener('input', () => { lrVal.textContent = parseFloat(lrSlider.value).toFixed(3); resetModel(); });
+    cSlider.addEventListener('input', () => { cValDisp.textContent = parseFloat(cSlider.value).toFixed(1); resetModel(); });
+
+    // Canvas Coordinates Conversion
+    function canvasToMath(cx, cy) {
+      return {
+        x: (cx / dataCanvas.width) * 2 - 1,
+        y: -((cy / dataCanvas.height) * 2 - 1)
+      };
+    }
+
+    function mathToCanvas(mx, my) {
+      return {
+        cx: (mx + 1) * 0.5 * dataCanvas.width,
+        cy: (-my + 1) * 0.5 * dataCanvas.height
+      };
+    }
+
+    // Initialize Random Points
+    function generateRandomPoints() {
+      points = [];
+      for (let i = 0; i < 15; i++) {
+        points.push({
+          x: Math.random() * 0.7 - 0.8,
+          y: Math.random() * 0.8 - 0.4 + 0.3,
+          label: 1
+        });
+        points.push({
+          x: Math.random() * 0.7 + 0.1,
+          y: Math.random() * 0.8 - 0.4 - 0.3,
+          label: -1
+        });
+      }
+      resetModel();
+    }
+
+    // Add / Delete Points Canvas Events
+    dataCanvas.addEventListener('click', (e) => {
+      const rect = dataCanvas.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
+      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
+      const mathPt = canvasToMath(cx, cy);
+      if (document.getElementById('deleteMode').checked) {
+        removePoint(mathPt);
+        return;
+      }
+      const activeClass = parseInt(document.querySelector('input[name="classSelect"]:checked').value);
+      points.push({ x: mathPt.x, y: mathPt.y, label: activeClass });
+      resetModel();
+    });
+
+    dataCanvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = dataCanvas.getBoundingClientRect();
+      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
+      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
+      const mathPt = canvasToMath(cx, cy);
+
+      removePoint(mathPt);
+    });
+
+    function removePoint(mathPt) {
+      let nearest = -1, distance = Infinity;
+      points.forEach((p, i) => {
+        const d = Math.hypot(p.x - mathPt.x, p.y - mathPt.y);
+        if (d < distance) { distance = d; nearest = i; }
+      });
+      if (distance < 0.08) {
+        points.splice(nearest, 1);
+        resetModel();
+      }
+    }
+
+    // Full-batch subgradient descent on the displayed soft-margin objective.
+    function trainStep() {
+      if (!points.some(p => p.label === 1) || !points.some(p => p.label === -1)) {
+        if (isPlaying) togglePlay();
+        lossTextElem.textContent = 'Add at least one point from each class to train.';
+        return;
+      }
+
+      const lr = parseFloat(lrSlider.value);
+      const C = parseFloat(cSlider.value);
+      let gradW0 = w[0], gradW1 = w[1], gradB = 0;
+      let active = 0;
+      for (const p of points) {
+        const margin = p.label * (w[0] * p.x + w[1] * p.y + b);
+        if (margin < 1) {
+          gradW0 -= C * p.label * p.x / points.length;
+          gradW1 -= C * p.label * p.y / points.length;
+          gradB -= C * p.label / points.length;
+          active++;
+        }
+      }
+      w[0] -= lr * gradW0;
+      w[1] -= lr * gradW1;
+      b -= lr * gradB;
+      epoch++;
+      const currentLoss = computeHingeLoss();
+      lossHistory.push(currentLoss);
+      stableEpochs = Math.abs(lastLoss - currentLoss) < 0.00005 ? stableEpochs + 1 : 0;
+      lastLoss = currentLoss;
+      updateUI();
+      lossTextElem.textContent += ` · ${active} margin violator${active === 1 ? '' : 's'} updated the model.`;
+      if (stableEpochs >= 20 || epoch >= MAX_EPOCHS) {
+        if (isPlaying) togglePlay();
+        lossTextElem.textContent += stableEpochs >= 20 ? ' Converged.' : ' Reached epoch limit.';
+      }
+    }
+
+    function computeHingeLoss() {
+      if (points.length === 0) return 0;
+      const C = parseFloat(cSlider.value);
+      let reg = 0.5 * (w[0] * w[0] + w[1] * w[1]);
+      let hinge = 0;
+
+      for (let p of points) {
+        let margin = p.label * (w[0] * p.x + w[1] * p.y + b);
+        hinge += Math.max(0, 1 - margin);
+      }
+
+      return reg + C * (hinge / points.length);
+    }
+
+    function resetModel() {
+      w = [0.0, 0.0];
+      b = 0.0;
+      epoch = 0;
+      lossHistory = [];
+      stableEpochs = 0;
+      lastLoss = Infinity;
+      if (isPlaying) togglePlay();
+      updateUI();
+    }
+
+    // UI Updates & Visualizations
+    function updateUI() {
+      drawDataCanvas();
+      drawLossCanvas();
+
+      modelStateElem.innerHTML = `
+        Epoch: ${epoch}<br>
+        Weights (w): [${w[0].toFixed(3)}, ${w[1].toFixed(3)}]<br>
+        Bias (b): ${b.toFixed(3)}<br>
+        Hyperplane: ${w[0].toFixed(2)}x₁ + ${w[1].toFixed(2)}x₂ + ${b.toFixed(2)} = 0
+      `;
+
+      const curLoss = computeHingeLoss();
+      const support = points.filter(p => p.label * (w[0] * p.x + w[1] * p.y + b) <= 1.001).length;
+      lossTextElem.textContent = `Objective: ${curLoss.toFixed(4)} · ${support} point${support === 1 ? '' : 's'} on or inside the margin`;
+    }
+
+    // Draw Data Canvas (Points + SVM Boundary)
+    function drawDataCanvas() {
+      dCtx.clearRect(0, 0, dataCanvas.width, dataCanvas.height);
+
+      // Draw Grid / Axes
+      dCtx.strokeStyle = '#334155';
+      dCtx.lineWidth = 1;
+      dCtx.beginPath();
+      dCtx.moveTo(dataCanvas.width / 2, 0); dCtx.lineTo(dataCanvas.width / 2, dataCanvas.height);
+      dCtx.moveTo(0, dataCanvas.height / 2); dCtx.lineTo(dataCanvas.width, dataCanvas.height / 2);
+      dCtx.stroke();
+
+      // Draw SVM Boundary Lines (Hyperplane & Margins)
+      if (w[0] !== 0 || w[1] !== 0) {
+        drawLine(0, '#38bdf8', 2);  // Hyperplane: w.x + b = 0
+        drawLine(1, '#94a3b8', 1, [4, 4]);  // Positive Margin: w.x + b = 1
+        drawLine(-1, '#94a3b8', 1, [4, 4]); // Negative Margin: w.x + b = -1
+      }
+
+      // Draw Data Points
+      for (let p of points) {
+        const { cx, cy } = mathToCanvas(p.x, p.y);
+        dCtx.beginPath();
+        dCtx.arc(cx, cy, 6, 0, 2 * Math.PI);
+        dCtx.fillStyle = p.label === 1 ? '#38bdf8' : '#fb923c';
+        dCtx.fill();
+        dCtx.strokeStyle = '#020617';
+        dCtx.lineWidth = 1.5;
+        dCtx.stroke();
+      }
+    }
+
+    function drawLine(offset, color, strokeWidth, dash = []) {
+      dCtx.save();
+      dCtx.strokeStyle = color;
+      dCtx.lineWidth = strokeWidth;
+      dCtx.setLineDash(dash);
+      dCtx.beginPath();
+
+      // Line Equation: w0*x + w1*y + b = offset  =>  y = (offset - b - w0*x) / w1
+      let x1 = -1, y1 = (offset - b - w[0] * x1) / (w[1] || 0.0001);
+      let x2 = 1, y2 = (offset - b - w[0] * x2) / (w[1] || 0.0001);
+
+      let p1 = mathToCanvas(x1, y1);
+      let p2 = mathToCanvas(x2, y2);
+
+      dCtx.moveTo(p1.cx, p1.cy);
+      dCtx.lineTo(p2.cx, p2.cy);
+      dCtx.stroke();
+      dCtx.restore();
+    }
+
+    // Draw Loss Tracking Graph
+    function drawLossCanvas() {
+      lCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
+
+      if (lossHistory.length < 2) return;
+
+      const maxLoss = Math.max(...lossHistory, 1.0);
+      const padding = 20;
+      const w = lossCanvas.width - padding * 2;
+      const h = lossCanvas.height - padding * 2;
+
+      lCtx.strokeStyle = '#ef4444';
+      lCtx.lineWidth = 2;
+      lCtx.beginPath();
+
+      for (let i = 0; i < lossHistory.length; i++) {
+        const x = padding + (i / (lossHistory.length - 1)) * w;
+        const y = lossCanvas.height - padding - (lossHistory[i] / maxLoss) * h;
+
+        if (i === 0) lCtx.moveTo(x, y);
+        else lCtx.lineTo(x, y);
+      }
+      lCtx.stroke();
+    }
+
+    // Play Loop
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      playBtn.textContent = isPlaying ? 'Pause' : 'Play until Convergence';
+      playBtn.classList.toggle('primary', isPlaying);
+
+      if (isPlaying) {
+        function loop() {
+          if (!isPlaying) return;
+          trainStep();
+          if (isPlaying) animationFrameId = requestAnimationFrame(loop);
+        }
+        loop();
+      } else {
+        cancelAnimationFrame(animationFrameId);
+      }
+    }
+
+    // Controls Event Listeners
+    stepBtn.addEventListener('click', trainStep);
+    playBtn.addEventListener('click', togglePlay);
+    randBtn.addEventListener('click', generateRandomPoints);
+    document.getElementById('resetBtn').addEventListener('click', resetModel);
+    clearBtn.addEventListener('click', () => {
+      points = [];
+      resetModel();
+    });
+
+    // Initialize App
+    generateRandomPoints();
+  </script>
+</body>
+</html>
