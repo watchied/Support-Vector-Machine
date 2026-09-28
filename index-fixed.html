@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Linear SVM Visualizer - CEI KMITL</title>
+  <title>Linear SVM Visualizer - CEi KMITL</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,10 +26,12 @@
     }
 
     body {
-      min-height: 100dvh;
+      height: 100dvh;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       padding: 28px 3vw 0;
+      overflow: hidden;
       background: #000;
       color: #fff;
       font-family: Arial, sans-serif;
@@ -57,57 +59,47 @@
       line-height: 1.4;
     }
 
-    /* Main layout: top panels share the same height */
+    /* Independently scrolling columns */
     .main-container {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: auto auto;
-      align-content: start;
-      align-items: stretch;
-      flex: 1 0 auto;
-      gap: 16px 22px;
+      display: flex;
+      flex: 1 1 0;
+      gap: 22px;
       width: 100%;
       max-width: 1440px;
       min-height: 0;
       margin: 0 auto 26px;
+      overflow: hidden;
     }
 
     .column {
-      display: contents;
-    }
-
-    .data-card {
-      grid-column: 1;
-      grid-row: 1;
-    }
-
-    .model-card {
-      grid-column: 2;
-      grid-row: 1;
-    }
-
-    .controls-card {
-      grid-column: 1;
-      grid-row: 2;
-      align-self: start;
-    }
-
-    .loss-card {
-      grid-column: 2;
-      grid-row: 2;
-      align-self: start;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+      min-height: 0;
+      padding-right: 6px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #887058 #222;
     }
 
     /* Shared panels */
     .card {
       display: flex;
       flex-direction: column;
+      flex-shrink: 0;
       gap: 12px;
       min-width: 0;
       padding: 18px 20px;
       background: #252525;
       border: 1px solid #454545;
       border-radius: 24px;
+    }
+
+    .data-card,
+    .model-card {
+      min-height: 540px;
     }
 
     h2 {
@@ -156,7 +148,8 @@
     }
 
     button:focus-visible,
-    input:focus-visible {
+    input:focus-visible,
+    select:focus-visible {
       outline: 2px solid #ffd28e;
       outline-offset: 3px;
     }
@@ -351,6 +344,35 @@
       pointer-events: none;
     }
 
+    /* Brush controls use the existing Data Canvas font */
+    .brush-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--economica);
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .brush-controls select {
+      padding: 6px;
+      color: #fff;
+      background: #443628;
+      border: 1px solid #a18c72;
+      border-radius: 5px;
+      font: inherit;
+    }
+
+    .brush-controls input {
+      width: 110px;
+      accent-color: var(--orange);
+    }
+
+    .brush-controls output {
+      min-width: 38px;
+    }
+
     /* Graph surfaces */
     .canvas-container {
       position: relative;
@@ -383,7 +405,6 @@
         0 8px 24px rgba(0, 0, 0, 0.2);
     }
 
-    /* Match the 1200 × 800 canvas ratio to prevent oval points */
     .data-card .data-canvas-container {
       flex: 0 0 auto;
       width: 100%;
@@ -391,6 +412,7 @@
       min-height: 0;
       aspect-ratio: 3 / 2;
       margin-block: auto;
+      touch-action: none;
     }
 
     canvas {
@@ -403,6 +425,18 @@
       position: absolute;
       inset: 0;
       cursor: crosshair;
+      touch-action: none;
+    }
+
+    #brushCursor {
+      position: absolute;
+      display: none;
+      z-index: 3;
+      border: 1px solid #ffe0ad;
+      border-radius: 50%;
+      background: #ffb35a12;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
     }
 
     /* Data graph axis labels */
@@ -428,7 +462,7 @@
       top: 10px;
     }
 
-    /* Hyperparameter & Control */
+    /* Hyperparameter & Control: original font settings */
     .controls-card,
     .controls-card h2,
     .controls-card label,
@@ -492,7 +526,7 @@
       margin-right: 7px;
     }
 
-    /* Model State */
+    /* Model State: original font settings */
     .model-card {
       font-family: var(--economica);
     }
@@ -562,6 +596,11 @@
       border-radius: 4px;
     }
 
+    #updateDetails {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
     /* Loss Graph */
     .loss-card {
       font-family: var(--economica);
@@ -615,7 +654,7 @@
       flex-shrink: 0;
       align-items: center;
       gap: 40px;
-      padding: 20px 32px 24px;
+      padding: 12px 32px 14px;
       margin: auto -3vw 0;
       background: linear-gradient(
         180deg,
@@ -657,7 +696,7 @@
     .members-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 13px 30px;
+      gap: 7px 24px;
       line-height: 1.4;
       overflow-wrap: anywhere;
     }
@@ -682,7 +721,7 @@
       }
 
       .main-container {
-        column-gap: 12px;
+        gap: 12px;
       }
 
       .card {
@@ -695,13 +734,20 @@
       }
 
       footer {
-        padding: 20px;
+        padding-left: 20px;
+        padding-right: 20px;
         margin-left: -15px;
         margin-right: -15px;
       }
     }
 
     @media (max-width: 640px) {
+      body {
+        height: auto;
+        min-height: 100dvh;
+        overflow: auto;
+      }
+
       header {
         padding: 8px 0 24px;
       }
@@ -713,13 +759,20 @@
 
       .main-container {
         display: block;
+        flex: 1 0 auto;
+        overflow: visible;
       }
 
       .column {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
+        min-height: auto;
+        padding-right: 0;
         margin-bottom: 14px;
+        overflow: visible;
+      }
+
+      .data-card,
+      .model-card {
+        min-height: 0;
       }
 
       .data-card {
@@ -744,7 +797,6 @@
 
       .members-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
       }
 
       .control-group {
@@ -776,7 +828,7 @@
         <div class="panel-heading">
           <h2>Data Canvas / Input</h2>
           <span class="hint">
-            Click to add point - Select Delete to remove
+            Click for a point · Drag to spray or erase
           </span>
         </div>
 
@@ -823,7 +875,29 @@
           </div>
         </div>
 
+        <div class="brush-controls">
+          <label for="brushTool">Brush</label>
+          <select id="brushTool">
+            <option value="point">Single point</option>
+            <option value="spray">Spray</option>
+          </select>
+
+          <label for="nozzleSize">Nozzle size</label>
+          <input
+            id="nozzleSize"
+            type="range"
+            min="10"
+            max="100"
+            value="35"
+          >
+          <output id="nozzleValue" for="nozzleSize">35 px</output>
+
+          <span id="pointCount">0 points</span>
+        </div>
+
         <div class="canvas-container data-canvas-container">
+          <span id="brushCursor" aria-hidden="true"></span>
+
           <canvas
             id="dataCanvas"
             width="1200"
@@ -835,7 +909,7 @@
 
       <!-- Hyperparameter & Control -->
       <section class="card controls-card">
-        <h2>Hyperparameter & Control</h2>
+        <h2>Hyperparameter &amp; Control</h2>
 
         <div class="control-group">
           <label for="cVal">
@@ -874,7 +948,7 @@
             type="number"
             value="3000"
             readonly
-            title="Fixed by the original training logic"
+            title="Fixed by the training logic"
           >
         </div>
 
@@ -893,7 +967,7 @@
       <section class="card model-card">
         <h2>Model State / Structure</h2>
 
-        <div class="model-label">Weight vector & parameters</div>
+        <div class="model-label">Weight vector &amp; parameters</div>
 
         <div class="stat-box" id="modelState">
           Epoch: 0<br>
@@ -904,11 +978,11 @@
 
         <div class="current-update">
           <div class="model-label">Current update</div>
-          <p class="explanation update-description">
-            Each training step adjusts the weights and bias to reduce
-            margin violations while keeping the weight vector small.
-            Step-specific results appear below the loss graph.
-          </p>
+          <p
+            class="explanation update-description"
+            id="updateDetails"
+            aria-live="polite"
+          >Click STEP to inspect a weight update.</p>
         </div>
 
         <p class="explanation">
@@ -943,7 +1017,7 @@
   </main>
 
   <footer>
-    <div class="brand">CEI <span>KMITL</span></div>
+    <div class="brand">CEi <span>KMITL</span></div>
 
     <div class="members">
       <div class="members-title">Group Member</div>
@@ -959,29 +1033,37 @@
     </div>
   </footer>
 
-  <!-- Embedded JavaScript Logic -->
   <script>
-    // Elements Setup
-    const dataCanvas = document.getElementById('dataCanvas');
-    const dCtx = dataCanvas.getContext('2d');
-    const lossCanvas = document.getElementById('lossCanvas');
-    const lCtx = lossCanvas.getContext('2d');
+    // Elements
+    const dataCanvas = document.getElementById("dataCanvas");
+    const dCtx = dataCanvas.getContext("2d");
 
-    const lrSlider = document.getElementById('lr');
-    const lrVal = document.getElementById('lrVal');
-    const cSlider = document.getElementById('cVal');
-    const cValDisp = document.getElementById('cValDisp');
+    const lossCanvas = document.getElementById("lossCanvas");
+    const lCtx = lossCanvas.getContext("2d");
 
-    const stepBtn = document.getElementById('stepBtn');
-    const playBtn = document.getElementById('playBtn');
-    const randBtn = document.getElementById('randBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    const lrSlider = document.getElementById("lr");
+    const lrVal = document.getElementById("lrVal");
+    const cSlider = document.getElementById("cVal");
+    const cValDisp = document.getElementById("cValDisp");
 
-    const modelStateElem = document.getElementById('modelState');
-    const lossTextElem = document.getElementById('lossText');
+    const stepBtn = document.getElementById("stepBtn");
+    const playBtn = document.getElementById("playBtn");
+    const randBtn = document.getElementById("randBtn");
+    const clearBtn = document.getElementById("clearBtn");
 
-    // Data & Model State
-    let points = []; // Array of {x: [-1, 1], y: [-1, 1], label: 1 | -1}
+    const modelStateElem = document.getElementById("modelState");
+    const lossTextElem = document.getElementById("lossText");
+    const updateDetails = document.getElementById("updateDetails");
+
+    const brushTool = document.getElementById("brushTool");
+    const nozzleSize = document.getElementById("nozzleSize");
+    const nozzleValue = document.getElementById("nozzleValue");
+    const brushCursor = document.getElementById("brushCursor");
+    const deleteMode = document.getElementById("deleteMode");
+    const pointCount = document.getElementById("pointCount");
+
+    // Data and model state
+    let points = [];
     let w = [0.0, 0.0];
     let b = 0.0;
     let epoch = 0;
@@ -990,13 +1072,32 @@
     let animationFrameId = null;
     let stableEpochs = 0;
     let lastLoss = Infinity;
+
     const MAX_EPOCHS = 3000;
+    const MAX_POINTS = 2000;
 
-    // Synchronize Hyperparameter Labels
-    lrSlider.addEventListener('input', () => { lrVal.textContent = parseFloat(lrSlider.value).toFixed(3); resetModel(); });
-    cSlider.addEventListener('input', () => { cValDisp.textContent = parseFloat(cSlider.value).toFixed(1); resetModel(); });
+    // Hyperparameter validation
+    lrSlider.addEventListener("change", () => {
+      lrSlider.value = Math.min(
+        0.1,
+        Math.max(0.001, Number(lrSlider.value) || 0.01)
+      );
 
-    // Canvas Coordinates Conversion
+      lrVal.textContent = Number(lrSlider.value).toFixed(3);
+      resetModel();
+    });
+
+    cSlider.addEventListener("change", () => {
+      cSlider.value = Math.min(
+        10,
+        Math.max(0.1, Number(cSlider.value) || 1)
+      );
+
+      cValDisp.textContent = Number(cSlider.value).toFixed(1);
+      resetModel();
+    });
+
+    // Coordinate conversion
     function canvasToMath(cx, cy) {
       return {
         x: (cx / dataCanvas.width) * 2 - 1,
@@ -1011,75 +1112,182 @@
       };
     }
 
-    // Initialize Random Points
+    // Random dataset
     function generateRandomPoints() {
       points = [];
+
       for (let i = 0; i < 15; i++) {
         points.push({
           x: Math.random() * 0.7 - 0.8,
           y: Math.random() * 0.8 - 0.4 + 0.3,
           label: 1
         });
+
         points.push({
           x: Math.random() * 0.7 + 0.1,
           y: Math.random() * 0.8 - 0.4 - 0.3,
           label: -1
         });
       }
+
       resetModel();
     }
 
-    // Add / Delete Points Canvas Events
-    dataCanvas.addEventListener('click', (e) => {
-      const rect = dataCanvas.getBoundingClientRect();
-      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
-      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
-      const mathPt = canvasToMath(cx, cy);
-      if (document.getElementById('deleteMode').checked) {
-        removePoint(mathPt);
-        return;
-      }
-      const activeClass = parseInt(document.querySelector('input[name="classSelect"]:checked').value);
-      points.push({ x: mathPt.x, y: mathPt.y, label: activeClass });
-      resetModel();
+    // Spray and erase brush
+    let brushDown = false;
+    let lastStamp = -Infinity;
+
+    nozzleSize.addEventListener("input", () => {
+      nozzleValue.textContent = nozzleSize.value + " px";
+
+      brushCursor.style.width = nozzleSize.value + "px";
+      brushCursor.style.height = nozzleSize.value + "px";
     });
 
-    dataCanvas.addEventListener('contextmenu', (e) => {
+    function brushPosition(e) {
+      const rect = dataCanvas.getBoundingClientRect();
+
+      return {
+        rect,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    function previewBrush(e) {
+      const { x, y } = brushPosition(e);
+      const diameter = Number(nozzleSize.value);
+
+      brushCursor.style.display = "block";
+      brushCursor.style.left = x + "px";
+      brushCursor.style.top = y + "px";
+      brushCursor.style.width = diameter + "px";
+      brushCursor.style.height = diameter + "px";
+    }
+
+    function stampBrush(e, forceErase = false) {
+      const { rect, x, y } = brushPosition(e);
+      const radius = Number(nozzleSize.value) / 2;
+      const erase = forceErase || deleteMode.checked;
+
+      if (erase) {
+        points = points.filter(p => {
+          const screenX = (p.x + 1) * rect.width / 2;
+          const screenY = (1 - p.y) * rect.height / 2;
+
+          return Math.hypot(screenX - x, screenY - y) > radius;
+        });
+      } else {
+        const spray = brushTool.value === "spray";
+
+        const label = Number(
+          document.querySelector(
+            'input[name="classSelect"]:checked'
+          ).value
+        );
+
+        const count = Math.min(
+          spray ? 6 : 1,
+          MAX_POINTS - points.length
+        );
+
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const r = spray
+            ? radius * Math.sqrt(Math.random())
+            : 0;
+
+          const px = x + r * Math.cos(angle);
+          const py = y + r * Math.sin(angle);
+
+          if (
+            px < 0 ||
+            py < 0 ||
+            px > rect.width ||
+            py > rect.height
+          ) {
+            continue;
+          }
+
+          points.push({
+            x: px / rect.width * 2 - 1,
+            y: 1 - py / rect.height * 2,
+            label
+          });
+        }
+      }
+
+      resetModel();
+    }
+
+    dataCanvas.addEventListener("pointerdown", e => {
+      if (e.button !== 0) return;
+
       e.preventDefault();
-      const rect = dataCanvas.getBoundingClientRect();
-      const cx = (e.clientX - rect.left) / rect.width * dataCanvas.width;
-      const cy = (e.clientY - rect.top) / rect.height * dataCanvas.height;
-      const mathPt = canvasToMath(cx, cy);
+      brushDown = true;
+      lastStamp = e.timeStamp;
 
-      removePoint(mathPt);
+      dataCanvas.setPointerCapture(e.pointerId);
+      previewBrush(e);
+      stampBrush(e);
     });
 
-    function removePoint(mathPt) {
-      let nearest = -1, distance = Infinity;
-      points.forEach((p, i) => {
-        const d = Math.hypot(p.x - mathPt.x, p.y - mathPt.y);
-        if (d < distance) { distance = d; nearest = i; }
-      });
-      if (distance < 0.08) {
-        points.splice(nearest, 1);
-        resetModel();
+    dataCanvas.addEventListener("pointermove", e => {
+      previewBrush(e);
+
+      if (!brushDown || e.timeStamp - lastStamp < 30) return;
+
+      if (brushTool.value === "spray" || deleteMode.checked) {
+        stampBrush(e);
+        lastStamp = e.timeStamp;
       }
+    });
+
+    for (const event of [
+      "pointerup",
+      "pointercancel",
+      "lostpointercapture"
+    ]) {
+      dataCanvas.addEventListener(event, () => {
+        brushDown = false;
+      });
     }
 
-    // Full-batch subgradient descent on the displayed soft-margin objective.
+    dataCanvas.addEventListener("pointerleave", () => {
+      brushCursor.style.display = "none";
+    });
+
+    dataCanvas.addEventListener("contextmenu", e => {
+      e.preventDefault();
+      stampBrush(e, true);
+    });
+
+    // Full-batch subgradient descent
     function trainStep() {
-      if (!points.some(p => p.label === 1) || !points.some(p => p.label === -1)) {
+      const hasPositive = points.some(p => p.label === 1);
+      const hasNegative = points.some(p => p.label === -1);
+
+      if (!hasPositive || !hasNegative) {
         if (isPlaying) togglePlay();
-        lossTextElem.textContent = 'Add at least one point from each class to train.';
+
+        lossTextElem.textContent =
+          "Add at least one point from each class to train.";
+
         return;
       }
 
       const lr = parseFloat(lrSlider.value);
       const C = parseFloat(cSlider.value);
-      let gradW0 = w[0], gradW1 = w[1], gradB = 0;
+
+      let gradW0 = w[0];
+      let gradW1 = w[1];
+      let gradB = 0;
       let active = 0;
+
       for (const p of points) {
-        const margin = p.label * (w[0] * p.x + w[1] * p.y + b);
+        const margin =
+          p.label * (w[0] * p.x + w[1] * p.y + b);
+
         if (margin < 1) {
           gradW0 -= C * p.label * p.x / points.length;
           gradW1 -= C * p.label * p.y / points.length;
@@ -1087,30 +1295,63 @@
           active++;
         }
       }
+
+      const previousW = [...w];
+      const previousB = b;
+      const previousLoss = computeHingeLoss();
+
       w[0] -= lr * gradW0;
       w[1] -= lr * gradW1;
       b -= lr * gradB;
       epoch++;
+
       const currentLoss = computeHingeLoss();
       lossHistory.push(currentLoss);
-      stableEpochs = Math.abs(lastLoss - currentLoss) < 0.00005 ? stableEpochs + 1 : 0;
+
+      stableEpochs =
+        Math.abs(lastLoss - currentLoss) < 0.00005
+          ? stableEpochs + 1
+          : 0;
+
       lastLoss = currentLoss;
+
       updateUI();
-      lossTextElem.textContent += ` · ${active} margin violator${active === 1 ? '' : 's'} updated the model.`;
+
+      const f = value => value.toFixed(5);
+
+      updateDetails.textContent =
+        `Epoch ${epoch}: ${active} of ${points.length} points have y(w·x+b) < 1.\n` +
+        `These points contribute to the hinge-loss gradient.\n\n` +
+        `Update: new value = old value − learning rate × gradient\n` +
+        `w₁: ${f(previousW[0])} − ${lr} × (${f(gradW0)}) = ${f(w[0])}\n` +
+        `w₂: ${f(previousW[1])} − ${lr} × (${f(gradW1)}) = ${f(w[1])}\n` +
+        `b: ${f(previousB)} − ${lr} × (${f(gradB)}) = ${f(b)}\n\n` +
+        `Objective: ${f(previousLoss)} → ${f(currentLoss)}`;
+
+      lossTextElem.textContent +=
+        ` · ${active} margin violator${active === 1 ? "" : "s"} updated the model.`;
+
       if (stableEpochs >= 20 || epoch >= MAX_EPOCHS) {
         if (isPlaying) togglePlay();
-        lossTextElem.textContent += stableEpochs >= 20 ? ' Converged.' : ' Reached epoch limit.';
+
+        lossTextElem.textContent +=
+          stableEpochs >= 20
+            ? " Converged."
+            : " Reached epoch limit.";
       }
     }
 
     function computeHingeLoss() {
       if (points.length === 0) return 0;
+
       const C = parseFloat(cSlider.value);
-      let reg = 0.5 * (w[0] * w[0] + w[1] * w[1]);
+      const reg = 0.5 * (w[0] * w[0] + w[1] * w[1]);
       let hinge = 0;
 
-      for (let p of points) {
-        let margin = p.label * (w[0] * p.x + w[1] * p.y + b);
+      for (const p of points) {
+        const margin =
+          p.label * (w[0] * p.x + w[1] * p.y + b);
+
         hinge += Math.max(0, 1 - margin);
       }
 
@@ -1118,18 +1359,28 @@
     }
 
     function resetModel() {
+      updateDetails.textContent =
+        "Click STEP to inspect a weight update. " +
+        "The weights shrink through regularization; " +
+        "points inside the margin also contribute to the gradient.";
+
       w = [0.0, 0.0];
       b = 0.0;
       epoch = 0;
       lossHistory = [];
       stableEpochs = 0;
       lastLoss = Infinity;
+
       if (isPlaying) togglePlay();
+
       updateUI();
     }
 
-    // UI Updates & Visualizations
+    // Update model state and graphs
     function updateUI() {
+      pointCount.textContent =
+        points.length + " / " + MAX_POINTS + " points";
+
       drawDataCanvas();
       drawLossCanvas();
 
@@ -1141,37 +1392,47 @@
       `;
 
       const curLoss = computeHingeLoss();
-      const support = points.filter(p => p.label * (w[0] * p.x + w[1] * p.y + b) <= 1.001).length;
-      lossTextElem.textContent = `Objective: ${curLoss.toFixed(4)} · ${support} point${support === 1 ? '' : 's'} on or inside the margin`;
+
+      const support = points.filter(p =>
+        p.label * (w[0] * p.x + w[1] * p.y + b) <= 1.001
+      ).length;
+
+      lossTextElem.textContent =
+        `Objective: ${curLoss.toFixed(4)} · ` +
+        `${support} point${support === 1 ? "" : "s"} on or inside the margin`;
     }
 
-    // Draw Data Canvas (Points + SVM Boundary)
+    // Draw data points, decision boundary, and margins
     function drawDataCanvas() {
       dCtx.clearRect(0, 0, dataCanvas.width, dataCanvas.height);
 
-      // Draw Grid / Axes
-      dCtx.strokeStyle = '#334155';
+      dCtx.strokeStyle = "#334155";
       dCtx.lineWidth = 1;
       dCtx.beginPath();
-      dCtx.moveTo(dataCanvas.width / 2, 0); dCtx.lineTo(dataCanvas.width / 2, dataCanvas.height);
-      dCtx.moveTo(0, dataCanvas.height / 2); dCtx.lineTo(dataCanvas.width, dataCanvas.height / 2);
+
+      dCtx.moveTo(dataCanvas.width / 2, 0);
+      dCtx.lineTo(dataCanvas.width / 2, dataCanvas.height);
+
+      dCtx.moveTo(0, dataCanvas.height / 2);
+      dCtx.lineTo(dataCanvas.width, dataCanvas.height / 2);
+
       dCtx.stroke();
 
-      // Draw SVM Boundary Lines (Hyperplane & Margins)
       if (w[0] !== 0 || w[1] !== 0) {
-        drawLine(0, '#38bdf8', 2);  // Hyperplane: w.x + b = 0
-        drawLine(1, '#94a3b8', 1, [4, 4]);  // Positive Margin: w.x + b = 1
-        drawLine(-1, '#94a3b8', 1, [4, 4]); // Negative Margin: w.x + b = -1
+        drawLine(0, "#38bdf8", 2);
+        drawLine(1, "#94a3b8", 1, [4, 4]);
+        drawLine(-1, "#94a3b8", 1, [4, 4]);
       }
 
-      // Draw Data Points
-      for (let p of points) {
+      for (const p of points) {
         const { cx, cy } = mathToCanvas(p.x, p.y);
+
         dCtx.beginPath();
         dCtx.arc(cx, cy, 6, 0, 2 * Math.PI);
-        dCtx.fillStyle = p.label === 1 ? '#38bdf8' : '#fb923c';
+        dCtx.fillStyle = p.label === 1 ? "#38bdf8" : "#fb923c";
         dCtx.fill();
-        dCtx.strokeStyle = '#020617';
+
+        dCtx.strokeStyle = "#020617";
         dCtx.lineWidth = 1.5;
         dCtx.stroke();
       }
@@ -1184,12 +1445,16 @@
       dCtx.setLineDash(dash);
       dCtx.beginPath();
 
-      // Line Equation: w0*x + w1*y + b = offset  =>  y = (offset - b - w0*x) / w1
-      let x1 = -1, y1 = (offset - b - w[0] * x1) / (w[1] || 0.0001);
-      let x2 = 1, y2 = (offset - b - w[0] * x2) / (w[1] || 0.0001);
+      const x1 = -1;
+      const y1 =
+        (offset - b - w[0] * x1) / (w[1] || 0.0001);
 
-      let p1 = mathToCanvas(x1, y1);
-      let p2 = mathToCanvas(x2, y2);
+      const x2 = 1;
+      const y2 =
+        (offset - b - w[0] * x2) / (w[1] || 0.0001);
+
+      const p1 = mathToCanvas(x1, y1);
+      const p2 = mathToCanvas(x2, y2);
 
       dCtx.moveTo(p1.cx, p1.cy);
       dCtx.lineTo(p2.cx, p2.cy);
@@ -1197,7 +1462,7 @@
       dCtx.restore();
     }
 
-    // Draw Loss Tracking Graph
+    // Draw loss history
     function drawLossCanvas() {
       lCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
 
@@ -1205,52 +1470,72 @@
 
       const maxLoss = Math.max(...lossHistory, 1.0);
       const padding = 20;
-      const w = lossCanvas.width - padding * 2;
-      const h = lossCanvas.height - padding * 2;
+      const plotWidth = lossCanvas.width - padding * 2;
+      const plotHeight = lossCanvas.height - padding * 2;
 
-      lCtx.strokeStyle = '#ef4444';
+      lCtx.strokeStyle = "#ef4444";
       lCtx.lineWidth = 2;
       lCtx.beginPath();
 
       for (let i = 0; i < lossHistory.length; i++) {
-        const x = padding + (i / (lossHistory.length - 1)) * w;
-        const y = lossCanvas.height - padding - (lossHistory[i] / maxLoss) * h;
+        const x =
+          padding + (i / (lossHistory.length - 1)) * plotWidth;
 
-        if (i === 0) lCtx.moveTo(x, y);
-        else lCtx.lineTo(x, y);
+        const y =
+          lossCanvas.height -
+          padding -
+          (lossHistory[i] / maxLoss) * plotHeight;
+
+        if (i === 0) {
+          lCtx.moveTo(x, y);
+        } else {
+          lCtx.lineTo(x, y);
+        }
       }
+
       lCtx.stroke();
     }
 
-    // Play Loop
+    // Automatic training
     function togglePlay() {
       isPlaying = !isPlaying;
-      playBtn.textContent = isPlaying ? 'Pause' : 'Play until Convergence';
-      playBtn.classList.toggle('primary', isPlaying);
+
+      playBtn.textContent =
+        isPlaying ? "Pause" : "Play until Convergence";
+
+      playBtn.classList.toggle("primary", isPlaying);
 
       if (isPlaying) {
         function loop() {
           if (!isPlaying) return;
+
           trainStep();
-          if (isPlaying) animationFrameId = requestAnimationFrame(loop);
+
+          if (isPlaying) {
+            animationFrameId = requestAnimationFrame(loop);
+          }
         }
+
         loop();
       } else {
         cancelAnimationFrame(animationFrameId);
       }
     }
 
-    // Controls Event Listeners
-    stepBtn.addEventListener('click', trainStep);
-    playBtn.addEventListener('click', togglePlay);
-    randBtn.addEventListener('click', generateRandomPoints);
-    document.getElementById('resetBtn').addEventListener('click', resetModel);
-    clearBtn.addEventListener('click', () => {
+    // Control events
+    stepBtn.addEventListener("click", trainStep);
+    playBtn.addEventListener("click", togglePlay);
+    randBtn.addEventListener("click", generateRandomPoints);
+
+    document.getElementById("resetBtn")
+      .addEventListener("click", resetModel);
+
+    clearBtn.addEventListener("click", () => {
       points = [];
       resetModel();
     });
 
-    // Initialize App
+    // Initialize
     generateRandomPoints();
   </script>
 </body>
